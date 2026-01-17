@@ -1,0 +1,46 @@
+{
+  "categoryBaselines": {
+    "groceries": {
+      "avgAmount": 350,
+      "stdDev": 150,
+      "frequency": 8,
+      "lastUpdated": "2025-01-01T00:00:00.000Z"
+    },
+    "dining": {
+      "avgAmount": 280,
+      "stdDev": 120,
+      "frequency": 12,
+      "lastUpdated": "2025-01-01T00:00:00.000Z"
+    },
+    "transport": {
+      "avgAmount": 180,
+      "stdDev": 80,
+      "frequency": 15,
+      "lastUpdated": "2025-01-01T00:00:00.000Z"
+    },
+    "utilities": {
+      "avgAmount": 1200,
+      "stdDev": 200,
+      "frequency": 3,
+      "lastUpdated": "2025-01-01T00:00:00.000Z"
+    },
+    "entertainment": {
+      "avgAmount": 450,
+      "stdDev": 200,
+      "frequency": 5,
+      "lastUpdated": "2025-01-01T00:00:00.000Z"
+    }
+  },
+  "personBaselines": {},
+  "anomalyHistory": [],
+  "feedbackStats": {
+    "totalAnomalies": 0,
+    "falsePositives": 0,
+    "confirmedAnomalies": 0
+  },
+  "learningConfig": {
+    "anomalyThresholdMultiplier": 2.0,
+    "minDataPoints": 5,
+    "decayFactor": 0.95
+  }
+}
