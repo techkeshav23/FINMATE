@@ -55,6 +55,24 @@ body {
   background: #bdc1c6;
 }
 
+/* Dark scrollbar for sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #444654;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #565869;
+}
+
 /* Markdown styling - Clean and readable */
 .markdown-content {
   font-size: 14px;
@@ -73,7 +91,6 @@ body {
 
 .markdown-content strong {
   font-weight: 600;
-  color: #1a73e8;
 }
 
 .markdown-content ul {

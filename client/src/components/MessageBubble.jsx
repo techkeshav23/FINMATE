@@ -1,7 +1,15 @@
 import { User, MessageSquare } from 'lucide-react';
 import DynamicComponentRenderer from './DynamicComponentRenderer';
-import ConfidenceBadge from './ConfidenceBadge';
-import ReasoningSteps from './ReasoningSteps';
+import { ConfidenceBadge, ReasoningSteps } from './ui';
+
+/**
+ * MessageBubble - Individual chat message component
+ * 
+ * PS.md Alignment:
+ * - "Chain of thought reasoning" - Shows reasoning steps
+ * - "System explains itself" - Confidence badge for transparency
+ * - "Actionable cards with verify button" - Renders dynamic UI components
+ */
 
 const MessageBubble = ({ message, onSuggestionClick }) => {
   const isUser = message.role === 'user';
@@ -17,13 +25,18 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
   const parseContent = (content) => {
     if (!content) return '';
     
+    // Ensure content is a string
+    const textContent = typeof content === 'string' 
+      ? content 
+      : (content?.message || content?.text || JSON.stringify(content) || '');
+    
     // Split by bold markers and create elements
-    const parts = content.split(/(\*\*[^*]+\*\*)/g);
+    const parts = textContent.split(/(\*\*[^*]+\*\*)/g);
     
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return (
-          <strong key={index} className="text-primary-600 font-semibold">
+          <strong key={index} className={isUser ? "text-white font-bold" : "text-primary-600 font-semibold"}>
             {part.slice(2, -2)}
           </strong>
         );
@@ -41,15 +54,15 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
   return (
     <div className={`flex items-start gap-2 sm:gap-3 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
-      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${
         isUser 
           ? 'bg-gray-200' 
-          : 'bg-primary-500'
+          : 'bg-white border border-gray-100'
       }`}>
         {isUser ? (
           <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
         ) : (
-          <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+          <img src="/logo.png" alt="AI" className="w-full h-full object-contain p-1" />
         )}
       </div>
 

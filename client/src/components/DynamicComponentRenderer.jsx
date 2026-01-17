@@ -29,16 +29,30 @@ import {
   Sparkles
 } from 'lucide-react';
 import { transactionsAPI } from '../services/api';
-import ComparisonView from './ComparisonView';
-import AnomalyCard from './AnomalyCard';
-import DecisionGuide from './DecisionGuide';
-import ClarificationOptions from './ClarificationOptions';
-import SettlementConfirmation from './SettlementConfirmation';
-import SettlementSuccess from './SettlementSuccess';
-import SimulationSlider from './SimulationSlider';
-import ChangeDetection from './ChangeDetection';
-import ReasoningSteps from './ReasoningSteps';
+
+// Organized imports from subfolders
+import { ComparisonView } from './charts';
+import { 
+  AnomalyCard, 
+  DecisionGuide, 
+  SettlementConfirmation, 
+  SettlementSuccess, 
+  SimulationSlider, 
+  ChangeDetection 
+} from './features';
+import { ClarificationOptions, ReasoningSteps } from './ui';
 import ThesysGenUI from './ThesysGenUI';
+
+/**
+ * DynamicComponentRenderer - Runtime UI component renderer
+ * 
+ * PS.md Alignment:
+ * - "Chart with clickable drill-down"
+ * - "Interactive visualizations"
+ * - "Settlement confirmation cards"
+ * - "Anomaly detection alerts"
+ * - "Budget simulation sliders"
+ */
 
 // Color palette for charts - Google style
 const COLORS = ['#1a73e8', '#34a853', '#fbbc04', '#ea4335', '#673ab7', '#e91e63'];
@@ -533,6 +547,10 @@ const DynamicComponentRenderer = ({ componentType, data, onAction, onDrillDown }
       return <ChangeDetection changes={data.changes} onExplore={onDrillDown} />;
     case 'reasoning_steps':
       return <ReasoningSteps reasoning={data} />;
+    case 'welcome':
+      // Welcome component is handled by ChatWindow's empty state
+      // Just return null if it somehow reaches here
+      return null;
     default:
       console.warn(`Unknown component type: ${componentType}`);
       return (
