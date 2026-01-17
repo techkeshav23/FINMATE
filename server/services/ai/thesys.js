@@ -1,14 +1,14 @@
 // Thesys API Client
 // Handles communication with Thesys GenUI platform for dynamic UI generation
 import axios from 'axios';
-import { generatePromptWithData } from '../config/systemPrompt.js';
+import { generatePromptWithData } from '../../config/systemPrompt.js';
 
 // Thesys API endpoint - Using OpenAI-compatible endpoint
 const THESYS_BASE_URL = process.env.THESYS_API_URL || 'https://api.thesys.dev/v1/embed';
 const THESYS_API_URL = `${THESYS_BASE_URL}/chat/completions`;
 
 // Enhanced GenUI System Prompt for dynamic component generation
-const GENUI_SYSTEM_PROMPT = `You are a financial UI generator for a roommate expense sharing app called "FairShare".
+const GENUI_SYSTEM_PROMPT = `You are a financial UI generator for FinMate, a Universal Financial Co-pilot.
 
 Your task is to generate DYNAMIC, INTERACTIVE UI components based on the user's question and data context.
 

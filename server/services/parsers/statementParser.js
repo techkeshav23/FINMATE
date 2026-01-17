@@ -189,7 +189,9 @@ export const parseEmailAlert = (text) => {
   return transactions;
 };
 
-export const detectAnomalies = (transactions, roommates) => {
+// Detect anomalies in transactions
+// participants parameter kept for API compatibility but not used in anomaly detection
+export const detectAnomalies = (transactions, participants = []) => {
   const anomalies = [];
   
   if (!transactions || transactions.length < 5) return anomalies;
@@ -197,11 +199,12 @@ export const detectAnomalies = (transactions, roommates) => {
   // Calculate averages by category
   const categoryStats = {};
   transactions.forEach(t => {
-    if (!categoryStats[t.category]) {
-      categoryStats[t.category] = { amounts: [], total: 0 };
+    const category = t.category || 'Other';
+    if (!categoryStats[category]) {
+      categoryStats[category] = { amounts: [], total: 0 };
     }
-    categoryStats[t.category].amounts.push(t.amount);
-    categoryStats[t.category].total += t.amount;
+    categoryStats[category].amounts.push(t.amount);
+    categoryStats[category].total += t.amount;
   });
   
   // Calculate average per category
@@ -216,7 +219,8 @@ export const detectAnomalies = (transactions, roommates) => {
   const recentTxns = transactions.slice(-10);
   
   recentTxns.forEach(txn => {
-    const stats = categoryStats[txn.category];
+    const category = txn.category || 'Other';
+    const stats = categoryStats[category];
     if (!stats) return;
     
     const deviation = ((txn.amount - stats.average) / stats.average) * 100;
@@ -227,8 +231,8 @@ export const detectAnomalies = (transactions, roommates) => {
         id: `anomaly_${txn.id || Date.now()}_high`,
         type: 'spike',
         severity: deviation > 100 ? 'high' : 'medium',
-        title: `Unusual ${txn.category} Expense`,
-        description: `"${txn.description}" is ${deviation.toFixed(0)}% higher than your average ${txn.category} spending`,
+        title: `Unusual ${category} Expense`,
+        description: `"${txn.description}" is ${deviation.toFixed(0)}% higher than your average ${category} spending`,
         stats: {
           expected: Math.round(stats.average),
           actual: txn.amount,

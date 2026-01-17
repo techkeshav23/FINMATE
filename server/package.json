@@ -1,7 +1,7 @@
 {
   "name": "finmate-server",
   "version": "1.0.0",
-  "description": "FinMate Backend - Financial Co-pilot for Roommates",
+  "description": "FinMate Backend - Personal-ised Finance Tracker for all personas",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -22,7 +22,8 @@
     "finmate",
     "financial",
     "assistant",
-    "roommates"
+    "personal-finance",
+    "expense-tracker"
   ],
   "author": "",
   "license": "MIT"

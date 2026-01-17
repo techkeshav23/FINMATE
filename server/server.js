@@ -3,12 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import multer from 'multer';
 import chatRoutes from './routes/chat.js';
-import { parseSMS, parseCSVStatement, parseEmailAlert, detectAnomalies } from './services/statementParser.js';
-import { parsePDFStatement, extractAccountSummary } from './services/pdfParser.js';
-import { learnFromTransactions, recordAnomaly, loadPatterns } from './services/patternLearning.js';
+import { parseSMS, parseCSVStatement, parseEmailAlert, detectAnomalies } from './services/parsers/statementParser.js';
+import { parsePDFStatement, extractAccountSummary } from './services/parsers/pdfParser.js';
+import { learnFromTransactions, recordAnomaly, loadPatterns } from './services/memory/patternLearning.js';
+import { setParticipantPatterns } from './services/memory/conversationMemory.js';
+import { detectPersonaFromData } from './config/systemPrompt.js';
 
 dotenv.config();
 
@@ -43,13 +45,92 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Load transaction data
-const transactionsPath = join(__dirname, 'data', 'transactions.json');
-const transactions = JSON.parse(readFileSync(transactionsPath, 'utf-8'));
+// Default data structure for FinMate - Supports ALL personas
+const getDefaultDataStructure = () => ({
+  config: {
+    persona: null, // Will be auto-detected: solo, traveler, household, group, vendor
+    currency: 'INR',
+    currencySymbol: '₹',
+    userName: null,
+    participants: [], // For group scenarios (roommates, family members, etc.)
+    accounts: [],     // Bank accounts for multi-account tracking
+    createdAt: new Date().toISOString(),
+    lastUpdated: new Date().toISOString()
+  },
+  transactions: [],
+  income: [],      // For vendor/business persona
+  budgets: [],     // Budget goals
+  goals: []        // Savings goals
+});
 
-// Make transactions available to routes
+// Load transaction data
+const dataPath = join(__dirname, 'data', 'transactions.json');
+let appData;
+
+try {
+  if (process.env.RESET_DATA === 'true') {
+    appData = getDefaultDataStructure();
+  } else if (existsSync(dataPath)) {
+    const loadedData = JSON.parse(readFileSync(dataPath, 'utf-8'));
+    // Migrate old structure if needed
+    if (loadedData.roommates !== undefined && !loadedData.config) {
+      console.log('📦 Migrating old data structure to new format...');
+      appData = {
+        config: {
+          persona: loadedData.roommates?.length > 1 ? 'group' : 'solo',
+          currency: 'INR',
+          currencySymbol: '₹',
+          userName: null,
+          participants: loadedData.roommates || [],
+          accounts: [],
+          createdAt: loadedData.lastUpdated || new Date().toISOString(),
+          lastUpdated: new Date().toISOString()
+        },
+        transactions: loadedData.transactions || [],
+        income: [],
+        budgets: [],
+        goals: []
+      };
+    } else {
+      appData = loadedData;
+    }
+  } else {
+    appData = getDefaultDataStructure();
+  }
+} catch (error) {
+  console.error('Error loading data:', error.message);
+  appData = getDefaultDataStructure();
+}
+
+// Auto-detect persona from data
+const detectedPersona = detectPersonaFromData(appData);
+if (detectedPersona && !appData.config.persona) {
+  appData.config.persona = detectedPersona;
+  console.log(`🎭 Auto-detected persona: ${detectedPersona}`);
+}
+
+// Initialize participant patterns for conversation context
+const initialParticipants = appData.config?.participants || [];
+if (initialParticipants.length > 0) {
+  setParticipantPatterns(initialParticipants);
+  console.log(`👥 Initialized participant patterns: ${initialParticipants.join(', ')}`);
+}
+
+// Helper to save data
+const saveData = () => {
+  appData.config.lastUpdated = new Date().toISOString();
+  writeFileSync(dataPath, JSON.stringify(appData, null, 2));
+};
+
+// Make data available to routes
 app.use((req, res, next) => {
-  req.transactions = transactions;
+  req.appData = appData;
+  // Backward compatibility
+  req.transactions = {
+    transactions: appData.transactions,
+    roommates: appData.config?.participants || [],
+    config: appData.config
+  };
   next();
 });
 
@@ -58,7 +139,28 @@ app.use('/api/chat', chatRoutes);
 
 // Get transactions endpoint
 app.get('/api/transactions', (req, res) => {
-  res.json(transactions);
+  res.json(appData);
+});
+
+// Get/Update config endpoint
+app.get('/api/config', (req, res) => {
+  res.json(appData.config);
+});
+
+app.patch('/api/config', (req, res) => {
+  const { persona, currency, currencySymbol, userName, participants } = req.body;
+  
+  if (persona) appData.config.persona = persona;
+  if (currency) appData.config.currency = currency;
+  if (currencySymbol) appData.config.currencySymbol = currencySymbol;
+  if (userName) appData.config.userName = userName;
+  if (participants) {
+    appData.config.participants = participants;
+    setParticipantPatterns(participants);
+  }
+  
+  saveData();
+  res.json({ message: 'Config updated', config: appData.config });
 });
 
 // Update transaction endpoint (e.g. for settling)
@@ -71,18 +173,18 @@ app.patch('/api/transactions/:id', (req, res) => {
     return res.status(400).json({ error: 'Invalid settled status. Must be boolean.' });
   }
 
-  const txnIndex = transactions.transactions.findIndex(t => t.id === id);
+  const txnIndex = appData.transactions.findIndex(t => t.id === id);
   
   if (txnIndex === -1) {
     return res.status(404).json({ error: 'Transaction not found' });
   }
   
   // Update transaction
-  transactions.transactions[txnIndex].settled = settled;
+  appData.transactions[txnIndex].settled = settled;
 
   // Persist to disk
   try {
-    writeFileSync(transactionsPath, JSON.stringify(transactions, null, 2));
+    saveData();
   } catch (error) {
     console.error('Error saving transactions:', error);
     return res.status(500).json({ error: 'Failed to save changes' });
@@ -90,17 +192,177 @@ app.patch('/api/transactions/:id', (req, res) => {
   
   res.json({ 
     message: 'Transaction updated', 
-    transaction: transactions.transactions[txnIndex] 
+    transaction: appData.transactions[txnIndex] 
   });
 });
 
-// CSV Upload endpoint
+// ==================== DATA MANAGEMENT ENDPOINTS ====================
+
+/**
+ * DELETE /api/transactions/:id - Delete a single transaction
+ */
+app.delete('/api/transactions/:id', (req, res) => {
+  const { id } = req.params;
+  
+  const txnIndex = appData.transactions.findIndex(t => t.id === id);
+  
+  if (txnIndex === -1) {
+    return res.status(404).json({ error: 'Transaction not found' });
+  }
+  
+  const deleted = appData.transactions.splice(txnIndex, 1)[0];
+  
+  try {
+    saveData();
+    res.json({ message: 'Transaction deleted', deleted });
+  } catch (error) {
+    console.error('Error deleting transaction:', error);
+    res.status(500).json({ error: 'Failed to delete transaction' });
+  }
+});
+
+/**
+ * POST /api/transactions/delete-batch - Delete multiple transactions by IDs
+ * Used when deleting a file's worth of transactions
+ */
+app.post('/api/transactions/delete-batch', (req, res) => {
+  try {
+    const { ids } = req.body;
+    
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'No transaction IDs provided' });
+    }
+    
+    const idsToDelete = new Set(ids);
+    const originalCount = appData.transactions.length;
+    
+    appData.transactions = appData.transactions.filter(t => !idsToDelete.has(t.id));
+    
+    const deletedCount = originalCount - appData.transactions.length;
+    
+    saveData();
+    res.json({ 
+      message: 'Transactions deleted',
+      deletedCount,
+      requestedCount: ids.length
+    });
+  } catch (error) {
+    console.error('Error batch deleting transactions:', error);
+    res.status(500).json({ error: 'Failed to delete transactions' });
+  }
+});
+
+/**
+ * DELETE /api/transactions - Clear ALL transactions (reset data)
+ */
+app.delete('/api/transactions', (req, res) => {
+  const { confirm } = req.query;
+  
+  if (confirm !== 'true') {
+    return res.status(400).json({ 
+      error: 'Confirmation required',
+      hint: 'Add ?confirm=true to confirm deletion of all transactions'
+    });
+  }
+  
+  const deletedCount = appData.transactions.length;
+  appData.transactions = [];
+  
+  // Also clear related data
+  appData.income = [];
+  appData.budgets = [];
+  appData.goals = [];
+  
+  try {
+    saveData();
+    res.json({ 
+      message: 'All transactions cleared',
+      deletedCount,
+      note: 'Your config (persona, participants) is preserved'
+    });
+  } catch (error) {
+    console.error('Error clearing transactions:', error);
+    res.status(500).json({ error: 'Failed to clear transactions' });
+  }
+});
+
+/**
+ * POST /api/transactions/replace - Replace ALL transactions with new data
+ * Use this when user wants to overwrite with a fresh upload
+ */
+app.post('/api/transactions/replace', (req, res) => {
+  const { transactions, confirm } = req.body;
+  
+  if (confirm !== true) {
+    return res.status(400).json({
+      error: 'Confirmation required',
+      hint: 'Include { confirm: true } in request body to replace all data'
+    });
+  }
+  
+  if (!Array.isArray(transactions)) {
+    return res.status(400).json({ error: 'transactions must be an array' });
+  }
+  
+  const oldCount = appData.transactions.length;
+  appData.transactions = transactions;
+  
+  try {
+    saveData();
+    res.json({
+      message: 'Transactions replaced',
+      previous: oldCount,
+      current: transactions.length
+    });
+  } catch (error) {
+    console.error('Error replacing transactions:', error);
+    res.status(500).json({ error: 'Failed to replace transactions' });
+  }
+});
+
+/**
+ * GET /api/data/stats - Get data statistics (for UI display)
+ */
+app.get('/api/data/stats', (req, res) => {
+  const transactions = appData.transactions || [];
+  const total = transactions.reduce((sum, t) => sum + t.amount, 0);
+  
+  // Group by source
+  const sources = {};
+  transactions.forEach(t => {
+    const src = t.source || 'Manual';
+    sources[src] = (sources[src] || 0) + 1;
+  });
+  
+  // Date range
+  const dates = transactions.map(t => new Date(t.date)).filter(d => !isNaN(d));
+  const oldest = dates.length > 0 ? new Date(Math.min(...dates)) : null;
+  const newest = dates.length > 0 ? new Date(Math.max(...dates)) : null;
+  
+  res.json({
+    transactionCount: transactions.length,
+    totalAmount: total,
+    sources,
+    dateRange: oldest && newest ? {
+      from: oldest.toISOString().split('T')[0],
+      to: newest.toISOString().split('T')[0]
+    } : null,
+    persona: appData.config?.persona,
+    participants: appData.config?.participants || []
+  });
+});
+
+// CSV Upload endpoint - Now flexible for any persona
 app.post('/api/transactions/upload', upload.single('file'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
+    // Generate unique file ID for tracking which transactions belong to which file
+    const fileId = `file_${Date.now()}`;
+    const fileName = req.file.originalname || 'Uploaded CSV';
+    
     const csvContent = req.file.buffer.toString('utf-8');
     const lines = csvContent.split('\n').filter(line => line.trim());
     
@@ -108,20 +370,30 @@ app.post('/api/transactions/upload', upload.single('file'), (req, res) => {
       return res.status(400).json({ error: 'CSV file is empty or has no data rows' });
     }
 
-    // Parse header
+    // Parse header - flexible column detection
     const header = lines[0].toLowerCase().split(',').map(h => h.trim());
-    const requiredFields = ['date', 'description', 'amount', 'payer', 'category'];
-    const missingFields = requiredFields.filter(f => !header.includes(f));
     
-    if (missingFields.length > 0) {
+    // Minimum required fields
+    const hasDate = header.includes('date');
+    const hasAmount = header.includes('amount');
+    const hasDescription = header.some(h => ['description', 'narration', 'details', 'particulars'].includes(h));
+    
+    if (!hasAmount) {
       return res.status(400).json({ 
-        error: `Missing required columns: ${missingFields.join(', ')}. Expected: date,description,amount,payer,category` 
+        error: 'CSV must have at least an "amount" column',
+        hint: 'Expected columns: date, description/narration, amount, category (optional: payer for group expenses)'
       });
     }
 
+    // Detect if this is group (has payer column) or solo (no payer)
+    const hasPayer = header.includes('payer');
+    const hasCategory = header.includes('category');
+    
     // Parse rows
     const newTransactions = [];
     const errors = [];
+    const discoveredParticipants = new Set();
+    const descCol = header.findIndex(h => ['description', 'narration', 'details', 'particulars'].includes(h));
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim());
@@ -130,37 +402,39 @@ app.post('/api/transactions/upload', upload.single('file'), (req, res) => {
       const row = {};
       header.forEach((col, idx) => row[col] = values[idx]);
 
-      // Validate row
-      const amount = parseFloat(row.amount);
+      // Validate amount
+      const amount = parseFloat(row.amount?.replace(/[₹,]/g, ''));
       if (isNaN(amount) || amount <= 0) {
         errors.push(`Row ${i + 1}: Invalid amount "${row.amount}"`);
         continue;
       }
 
-      // Check if payer exists in roommates
-      if (!transactions.roommates.includes(row.payer)) {
-        errors.push(`Row ${i + 1}: Unknown payer "${row.payer}". Valid: ${transactions.roommates.join(', ')}`);
-        continue;
+      // Track payers for group detection
+      if (row.payer) {
+        discoveredParticipants.add(row.payer);
       }
 
-      // Create transaction with equal split
-      const perPerson = Math.round(amount / transactions.roommates.length);
-      const split = {};
-      transactions.roommates.forEach((name, idx) => {
-        // Handle rounding by giving remainder to first person
-        split[name] = idx === 0 ? amount - (perPerson * (transactions.roommates.length - 1)) : perPerson;
-      });
-
-      newTransactions.push({
+      // Build transaction with sourceFile tracking
+      const txn = {
         id: `txn_csv_${Date.now()}_${i}`,
         date: row.date || new Date().toISOString().split('T')[0],
-        description: row.description,
+        description: row[header[descCol]] || row.description || row.narration || 'Transaction',
         amount: amount,
-        payer: row.payer,
         category: row.category || 'Other',
-        split: split,
-        settled: false
-      });
+        settled: false,
+        source: 'CSV Import',
+        sourceFile: {
+          id: fileId,
+          name: fileName
+        }
+      };
+
+      // Add payer if group expense
+      if (row.payer) {
+        txn.payer = row.payer;
+      }
+
+      newTransactions.push(txn);
     }
 
     if (newTransactions.length === 0) {
@@ -170,15 +444,55 @@ app.post('/api/transactions/upload', upload.single('file'), (req, res) => {
       });
     }
 
-    // Add new transactions
-    transactions.transactions.push(...newTransactions);
+    // Update participants if we discovered any
+    if (discoveredParticipants.size > 0) {
+      const existingParticipants = new Set(appData.config.participants || []);
+      discoveredParticipants.forEach(p => existingParticipants.add(p));
+      appData.config.participants = Array.from(existingParticipants);
+      setParticipantPatterns(appData.config.participants);
+      console.log(`👥 Participants: ${appData.config.participants.join(', ')}`);
+    }
 
-    // Persist to disk
-    writeFileSync(transactionsPath, JSON.stringify(transactions, null, 2));
+    // Auto-detect persona if not set
+    if (!appData.config.persona) {
+      if (discoveredParticipants.size > 1) {
+        appData.config.persona = 'group';
+      } else {
+        appData.config.persona = 'solo';
+      }
+      console.log(`🎭 Auto-set persona: ${appData.config.persona}`);
+    }
+
+    // Add splits for group expenses if we have participants
+    if (appData.config.persona === 'group' && appData.config.participants.length > 0) {
+      newTransactions.forEach(txn => {
+        if (txn.payer && !txn.split) {
+          const participants = appData.config.participants;
+          const perPerson = Math.round(txn.amount / participants.length);
+          txn.split = {};
+          participants.forEach((name, idx) => {
+            txn.split[name] = idx === 0 ? txn.amount - (perPerson * (participants.length - 1)) : perPerson;
+          });
+        }
+      });
+    }
+
+    // Add new transactions
+    appData.transactions.push(...newTransactions);
+    saveData();
+
+    // Calculate total amount for tracking
+    const totalAmount = newTransactions.reduce((sum, txn) => sum + txn.amount, 0);
 
     res.json({ 
       message: 'Transactions imported successfully',
       added: newTransactions.length,
+      transactionIds: newTransactions.map(t => t.id),
+      totalAmount: totalAmount,
+      fileId: fileId,
+      fileName: fileName,
+      persona: appData.config.persona,
+      participants: appData.config.participants,
       errors: errors.length > 0 ? errors : undefined
     });
 
@@ -296,46 +610,68 @@ app.post('/api/transactions/parse-text', (req, res) => {
 // Confirm import of parsed transactions
 app.post('/api/transactions/confirm-import', (req, res) => {
   try {
-    const { transactions: parsedTxns } = req.body;
+    const { transactions: parsedTxns, defaultPayer, fileName, sourceType } = req.body;
 
     if (!parsedTxns || parsedTxns.length === 0) {
       return res.status(400).json({ error: 'No transactions to import' });
     }
 
-    const newTransactions = parsedTxns.map((txn, idx) => {
-      // Create split among roommates
-      const perPerson = Math.round(txn.amount / transactions.roommates.length);
-      const split = {};
-      transactions.roommates.forEach((name, i) => {
-        split[name] = i === 0 ? txn.amount - (perPerson * (transactions.roommates.length - 1)) : perPerson;
-      });
+    // Generate file ID for tracking
+    const fileId = `file_${Date.now()}`;
+    const finalFileName = fileName || `${sourceType || 'Import'}_${new Date().toLocaleDateString()}`;
 
-      return {
+    const participants = appData.config.participants || [];
+    const isGroupMode = appData.config.persona === 'group' && participants.length > 0;
+
+    const newTransactions = parsedTxns.map((txn, idx) => {
+      const transaction = {
         id: `txn_import_${Date.now()}_${idx}`,
         date: txn.date || new Date().toISOString().split('T')[0],
         description: txn.description,
         amount: txn.amount,
-        payer: transactions.roommates[0], // Default to first roommate
         category: txn.category || 'Other',
-        split,
         settled: false,
-        source: txn.source || 'Imported'
+        source: txn.source || 'Imported',
+        sourceFile: {
+          id: fileId,
+          name: finalFileName
+        }
       };
+
+      // Only add payer/split for group mode
+      if (isGroupMode) {
+        transaction.payer = defaultPayer || participants[0] || 'Unknown';
+        
+        // Create equal split
+        const perPerson = Math.round(txn.amount / participants.length);
+        transaction.split = {};
+        participants.forEach((name, i) => {
+          transaction.split[name] = i === 0 ? txn.amount - (perPerson * (participants.length - 1)) : perPerson;
+        });
+      }
+
+      return transaction;
     });
 
     // Add to transactions
-    transactions.transactions.push(...newTransactions);
+    appData.transactions.push(...newTransactions);
+    saveData();
 
-    // Persist to disk
-    writeFileSync(transactionsPath, JSON.stringify(transactions, null, 2));
+    // Calculate total amount for tracking
+    const totalAmount = newTransactions.reduce((sum, txn) => sum + txn.amount, 0);
 
     res.json({ 
       message: 'Transactions imported successfully',
-      added: newTransactions.length
+      added: newTransactions.length,
+      transactionIds: newTransactions.map(t => t.id),
+      totalAmount: totalAmount,
+      fileId: fileId,
+      fileName: finalFileName,
+      persona: appData.config.persona
     });
 
     // Re-learn patterns with new data
-    learnFromTransactions(transactions.transactions, transactions.roommates);
+    learnFromTransactions(appData.transactions, participants);
 
   } catch (error) {
     console.error('Import confirm error:', error);
@@ -346,7 +682,8 @@ app.post('/api/transactions/confirm-import', (req, res) => {
 // Get anomalies endpoint (with learning)
 app.get('/api/transactions/anomalies', (req, res) => {
   try {
-    const anomalies = detectAnomalies(transactions.transactions, transactions.roommates);
+    const participants = appData.config?.participants || [];
+    const anomalies = detectAnomalies(appData.transactions, participants);
     res.json({ anomalies });
   } catch (error) {
     console.error('Anomaly detection error:', error);
@@ -399,12 +736,20 @@ app.get('/api/transactions/patterns', (req, res) => {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'FinMate server is running!' });
+  res.json({ 
+    status: 'ok', 
+    message: 'FinMate server is running!',
+    persona: appData.config?.persona || 'not set',
+    transactionCount: appData.transactions?.length || 0
+  });
 });
 
 // Initialize patterns on startup
-learnFromTransactions(transactions.transactions, transactions.roommates);
+const startupParticipants = appData.config?.participants || [];
+learnFromTransactions(appData.transactions, startupParticipants);
 console.log('📊 Learned spending patterns from transaction history');
+console.log(`🎭 Current persona: ${appData.config?.persona || 'not set'}`);
+console.log(`📝 Transactions loaded: ${appData.transactions?.length || 0}`);
 
 app.listen(PORT, () => {
   console.log(`🚀 FinMate server running on http://localhost:${PORT}`);

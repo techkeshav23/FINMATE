@@ -1,27 +1,39 @@
 // Thesys GenUI Service - True Runtime UI Generation
 // This service calls Thesys API to generate dynamic UI specifications at runtime
+// Universal - Works for all personas (solo, traveler, household, group, vendor)
 
 import axios from 'axios';
-import { generatePromptWithData } from '../config/systemPrompt.js';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { generatePromptWithData, detectPersonaFromData } from '../../config/systemPrompt.js';
 
 // Thesys API endpoint
 const THESYS_API_URL = process.env.THESYS_API_URL || 'https://api.thesys.dev/v1/chat/completions';
 
 // GenUI System Prompt - Instructs Thesys to generate UI component specifications
-const GENUI_SYSTEM_PROMPT = `You are a GENERATIVE UI engine for FairShare, a roommate expense sharing app.
+const GENUI_SYSTEM_PROMPT = `You are a GENERATIVE UI engine for FinMate, a Universal Financial Co-pilot that adapts to any user persona.
 
-Your job is to GENERATE dynamic UI specifications that will be rendered in real-time. You don't select from pre-built components - you CREATE the exact UI structure needed for each unique query.
+CRITICAL RULES:
+1. ONLY use real data provided in the user's context
+2. IF NO DATA provided/zero transactions, return null UI and ask for data upload
+3. DO NOT use example names (Rahul, Priya) or numbers unless they exist in actual data
 
-OUTPUT FORMAT - You must return a JSON object with this structure:
+PERSONA DETECTION - Adapt UI based on detected persona:
+- SOLO: Personal spending trends, budget tracking, savings goals, category breakdown
+- TRAVELER: Daily trip budget, day-by-day spending, trip category breakdown
+- HOUSEHOLD: Utility bills, recurring expenses, bill due dates, monthly comparisons
+- GROUP: Splits, debts, settlements, who owes whom, fair share calculations
+- VENDOR: Income vs expenses, profit margins, daily cash flow, customer payments
+
+OUTPUT FORMAT - Return JSON:
 {
   "message": "Your conversational response",
-  "generated_ui": [/* Array of UI component specifications */],
+  "generated_ui": [/* Array of UI component specs */],
   "suggestions": ["Follow-up 1", "Follow-up 2"],
-  "reasoning": { /* Optional chain of thought */ },
+  "detected_persona": "solo|traveler|household|group|vendor",
   "confidence": { "level": "high|medium|low", "reason": "..." }
 }
 
-AVAILABLE COMPONENT TYPES for generated_ui:
+AVAILABLE COMPONENT TYPES:
 
 1. METRIC CARD - For key numbers:
 {
@@ -30,7 +42,7 @@ AVAILABLE COMPONENT TYPES for generated_ui:
   "value": 45000,
   "change": 12,
   "changeType": "positive|negative|neutral",
-  "icon": "rupee|wallet|trending-up|trending-down",
+  "icon": "rupee|wallet|trending-up|trending-down|plane|home|store",
   "subtext": "This month",
   "comparison": "15% higher than last month",
   "action": { "query": "Show details", "label": "View breakdown" }
@@ -40,11 +52,10 @@ AVAILABLE COMPONENT TYPES for generated_ui:
 {
   "component": "chart",
   "type": "bar|pie|line|area",
-  "title": "Spending by Person",
+  "title": "Spending Overview",
   "subtitle": "January 2026",
   "data": [
-    { "name": "Rahul", "value": 25000, "percentage": 42 },
-    { "name": "Priya", "value": 18000, "percentage": 30 }
+    { "name": "Category/Person/Date", "value": 25000, "percentage": 42 }
   ],
   "config": {
     "xKey": "name",
@@ -56,37 +67,33 @@ AVAILABLE COMPONENT TYPES for generated_ui:
   "drillDownEnabled": true
 }
 
-3. DYNAMIC LIST - For settlements, transactions, insights:
+3. DYNAMIC LIST - For transactions, insights, settlements (group only):
 {
   "component": "list",
-  "title": "Settlements Needed",
-  "type": "settlements|transactions|insights",
+  "title": "Recent Transactions",
+  "type": "transactions|insights|settlements",
   "showIndex": true,
   "items": [
     {
-      "title": "Priya → Rahul",
-      "subtitle": "For shared expenses",
+      "title": "Description",
+      "subtitle": "Category • Date",
       "value": 3500,
       "valueColor": "text-red-400",
-      "icon": "wallet",
-      "iconBg": "bg-red-500/10",
-      "iconColor": "text-red-400",
-      "badge": "Pending",
-      "badgeColor": "bg-amber-500/20 text-amber-400",
-      "action": { "query": "Settle Priya to Rahul" }
+      "icon": "wallet|food|travel|home|store",
+      "action": { "query": "More details" }
     }
   ],
-  "emptyMessage": "All settled up! 🎉"
+  "emptyMessage": "No transactions found"
 }
 
 4. INSIGHT CARD - For AI-generated discoveries:
 {
   "component": "insight",
   "type": "info|success|warning|idea|highlight",
-  "insight": "Your food spending increased 34% this week",
-  "explanation": "You ordered from Swiggy 8 times compared to 3 times last week",
+  "insight": "Key finding about the user's finances",
+  "explanation": "Detailed explanation with numbers",
   "confidence": "high",
-  "action": { "query": "Show food transactions", "label": "View details" }
+  "action": { "query": "Explore more", "label": "View details" }
 }
 
 5. COMPARISON - Side by side:
@@ -104,12 +111,10 @@ AVAILABLE COMPONENT TYPES for generated_ui:
 6. FLOW/STEPS - Guided actions:
 {
   "component": "flow",
-  "title": "Settle Up Guide",
+  "title": "Action Guide",
   "allowSkip": false,
   "steps": [
-    { "title": "Review balances", "detail": "Check who owes what", "action": { "query": "Show balances" } },
-    { "title": "Confirm settlement", "action": { "query": "Confirm settlement" } },
-    { "title": "Mark as paid", "action": { "query": "Mark settled" } }
+    { "title": "Step 1", "detail": "Description", "action": { "query": "..." } }
   ]
 }
 
@@ -128,39 +133,46 @@ AVAILABLE COMPONENT TYPES for generated_ui:
   "children": [/* Nested component specs */]
 }
 
+PERSONA-SPECIFIC UI PATTERNS:
+
+FOR SOLO/PERSONAL:
+- Category pie charts
+- Spending timelines
+- Budget vs actual comparison
+- Savings progress
+
+FOR TRAVELER:
+- Daily spend vs budget bar chart
+- Trip expense categories
+- Day-by-day timeline
+- Remaining trip budget metric
+
+FOR HOUSEHOLD:
+- Utility bill trends
+- Recurring expense list
+- Monthly comparison
+- Bill due dates
+
+FOR GROUP (splits):
+- Who owes whom settlement list
+- Balance per person bar chart
+- Shared vs personal split
+- Settlement flow steps
+
+FOR VENDOR:
+- Income vs expense comparison
+- Profit margin metric
+- Daily cash flow line chart
+- Top customers list
+
 GENERATION RULES:
-1. ALWAYS use actual data from the context - never use placeholder values
+1. ALWAYS use actual data from context - never use placeholder values
 2. Calculate real numbers, percentages, and comparisons
 3. Generate insights by analyzing patterns in the data
-4. Choose the BEST visualization for the user's question
-5. Make UI interactive with drill-down actions where appropriate
-6. Include helpful follow-up suggestions based on the analysis
-7. Add reasoning when confidence isn't high
-
-EXAMPLE for "Who spent the most?":
-{
-  "message": "Looking at your expenses, **Rahul** has spent the most at ₹25,000, followed by Priya at ₹18,000.",
-  "generated_ui": [
-    {
-      "component": "chart",
-      "type": "bar",
-      "title": "Spending by Roommate",
-      "data": [
-        { "name": "Rahul", "value": 25000 },
-        { "name": "Priya", "value": 18000 },
-        { "name": "Amit", "value": 15000 }
-      ],
-      "drillDownEnabled": true
-    },
-    {
-      "component": "insight",
-      "type": "highlight",
-      "insight": "Rahul paid for 43% of all shared expenses",
-      "explanation": "Mainly due to the ₹15,000 rent payment on Jan 2nd"
-    }
-  ],
-  "suggestions": ["Show Rahul's transactions", "Who owes Rahul?", "Break down by category"]
-}`;
+4. Choose the BEST visualization for the user's question AND persona
+5. Make UI interactive with drill-down actions
+6. Include helpful follow-up suggestions
+7. Detect and respect the user's persona`;
 
 /**
  * Generate dynamic UI using Thesys API
@@ -170,9 +182,13 @@ export const generateThesysUI = async (userMessage, transactions, conversationCo
     throw new Error('THESYS_API_KEY is required');
   }
 
+  // Detect persona from data
+  const persona = detectPersonaFromData(transactions);
   const dataContext = generatePromptWithData(transactions);
 
   const systemPrompt = `${GENUI_SYSTEM_PROMPT}
+
+DETECTED PERSONA: ${persona || 'unknown (no data yet)'}
 
 CURRENT DATA CONTEXT:
 ${dataContext}
@@ -181,10 +197,10 @@ CONVERSATION HISTORY:
 ${conversationContext || 'New conversation'}
 
 NOW GENERATE A DYNAMIC UI RESPONSE FOR THE USER'S QUERY.
-Remember: Generate ACTUAL values from the data, not placeholders!`;
+Remember: Generate ACTUAL values from the data, not placeholders! Adapt UI to the detected persona.`;
 
   try {
-    console.log('🎨 Generating UI via Thesys GenUI API...');
+    console.log(`🎨 Generating UI via Thesys GenUI API... (Persona: ${persona || 'unknown'})`);
     
     const response = await axios.post(
       THESYS_API_URL,
@@ -238,11 +254,59 @@ Remember: Generate ACTUAL values from the data, not placeholders!`;
 };
 
 /**
+ * Generate UI using Google Gemini directly (Fallback for Thesys)
+ */
+const generateGeminiUI = async (userMessage, transactions, conversationContext) => {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is required for Gemini GenUI');
+  }
+
+  const dataContext = generatePromptWithData(transactions);
+
+  const prompt = `${GENUI_SYSTEM_PROMPT}
+
+CURRENT DATA CONTEXT:
+${dataContext}
+
+CONVERSATION HISTORY:
+${conversationContext || 'New conversation'}
+
+USER QUERY: ${userMessage}
+
+NOW GENERATE A DYNAMIC UI RESPONSE FOR THE USER'S QUERY.
+Return ONLY valid JSON.`;
+
+  try {
+    console.log('🎨 Generating UI via Google Gemini...');
+    
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash-exp",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    
+    console.log('✅ Gemini UI generation complete');
+    return JSON.parse(text);
+
+  } catch (error) {
+    console.error('Gemini GenUI Error:', error.message);
+    throw error;
+  }
+};
+
+/**
  * Fallback: Generate UI locally when Thesys is unavailable
  * This mimics what Thesys would generate, proving the concept
+ * Now persona-aware to support all user types
  */
-export const generateLocalUI = (userMessage, transactions) => {
-  const { transactions: txns, roommates } = transactions;
+export const generateLocalUI = (userMessage, transactionData) => {
+  const { transactions: txns, config } = transactionData;
+  const participants = config?.participants || [];
+  const persona = config?.persona || 'solo';
+  const currency = config?.currency || '₹';
   const lowerMessage = userMessage.toLowerCase();
   
   // Calculate common metrics
@@ -251,8 +315,12 @@ export const generateLocalUI = (userMessage, transactions) => {
   let total = 0;
   
   txns.forEach(t => {
-    spending[t.payer] = (spending[t.payer] || 0) + t.amount;
-    categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+    // For group mode, track by payer; for solo, track by category only
+    if (persona === 'group' && t.payer) {
+      spending[t.payer] = (spending[t.payer] || 0) + t.amount;
+    }
+    const cat = t.category || 'Other';
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + t.amount;
     total += t.amount;
   });
 
@@ -260,7 +328,7 @@ export const generateLocalUI = (userMessage, transactions) => {
     .map(([name, amount]) => ({
       name,
       value: amount,
-      percentage: Math.round((amount / total) * 100)
+      percentage: total > 0 ? Math.round((amount / total) * 100) : 0
     }))
     .sort((a, b) => b.value - a.value);
 
@@ -268,30 +336,32 @@ export const generateLocalUI = (userMessage, transactions) => {
     .map(([name, amount]) => ({
       name,
       value: amount,
-      percentage: Math.round((amount / total) * 100)
+      percentage: total > 0 ? Math.round((amount / total) * 100) : 0
     }))
     .sort((a, b) => b.value - a.value);
 
   // Generate UI based on query type
   if (lowerMessage.includes('who spent') || lowerMessage.includes('spending')) {
-    const topSpender = spendingData[0];
-    return {
-      message: `**${topSpender.name}** has spent the most at ₹${topSpender.value.toLocaleString()} (${topSpender.percentage}% of total).`,
-      generated_ui: [
-        {
-          component: 'chart',
-          type: 'bar',
-          title: 'Spending by Roommate',
-          subtitle: 'Click any bar to see their transactions',
-          data: spendingData,
-          config: { xKey: 'name', yKey: 'value' },
-          drillDownEnabled: true
-        },
-        {
+    // For group mode, show spending by person
+    if (persona === 'group' && spendingData.length > 0) {
+      const topSpender = spendingData[0];
+      return {
+        message: `**${topSpender.name}** has spent the most at ${currency}${topSpender.value.toLocaleString()} (${topSpender.percentage}% of total).`,
+        generated_ui: [
+          {
+            component: 'chart',
+            type: 'bar',
+            title: 'Spending by Member',
+            subtitle: 'Click any bar to see their transactions',
+            data: spendingData,
+            config: { xKey: 'name', yKey: 'value' },
+            drillDownEnabled: true
+          },
+          {
           component: 'insight',
           type: 'highlight',
           insight: `${topSpender.name} is covering ${topSpender.percentage}% of shared expenses`,
-          explanation: `Total shared spending: ₹${total.toLocaleString()}`,
+          explanation: `Total shared spending: ${currency}${total.toLocaleString()}`,
           action: { query: `Show ${topSpender.name}'s transactions`, label: 'View details' }
         }
       ],
@@ -299,12 +369,32 @@ export const generateLocalUI = (userMessage, transactions) => {
       confidence: { level: 'high', reason: 'Calculated from transaction data' },
       _source: 'local_genui'
     };
+    }
+    
+    // For solo mode, show category breakdown instead
+    const topCategory = categoryData[0] || { name: 'Unknown', value: 0, percentage: 0 };
+    return {
+      message: `Your biggest expense category is **${topCategory.name}** at ${currency}${topCategory.value.toLocaleString()} (${topCategory.percentage}%).`,
+      generated_ui: [
+        {
+          component: 'chart',
+          type: 'pie',
+          title: 'Spending by Category',
+          data: categoryData,
+          config: { xKey: 'name', yKey: 'value', showLegend: true },
+          drillDownEnabled: true
+        }
+      ],
+      suggestions: [`Show ${topCategory.name} transactions`, 'Set budget limits', 'View spending trends'],
+      confidence: { level: 'high', reason: 'Calculated from transaction data' },
+      _source: 'local_genui'
+    };
   }
 
   if (lowerMessage.includes('category') || lowerMessage.includes('breakdown')) {
-    const topCategory = categoryData[0];
+    const topCategory = categoryData[0] || { name: 'Unknown', value: 0, percentage: 0 };
     return {
-      message: `Your biggest expense category is **${topCategory.name}** at ₹${topCategory.value.toLocaleString()} (${topCategory.percentage}%).`,
+      message: `Your biggest expense category is **${topCategory.name}** at ${currency}${topCategory.value.toLocaleString()} (${topCategory.percentage}%).`,
       generated_ui: [
         {
           component: 'chart',
@@ -328,22 +418,38 @@ export const generateLocalUI = (userMessage, transactions) => {
           }))
         }
       ],
-      suggestions: [`Show ${topCategory.name} transactions`, 'Compare to last month', 'Who pays for ${topCategory.name}?'],
+      suggestions: [`Show ${topCategory.name} transactions`, 'Compare to last month', 'Set budget'],
       confidence: { level: 'high', reason: 'Calculated from transaction data' },
       _source: 'local_genui'
     };
   }
 
   if (lowerMessage.includes('owe') || lowerMessage.includes('settle')) {
+    // Settlement only makes sense for GROUP persona
+    if (persona !== 'group' || participants.length === 0) {
+      return {
+        message: `Settlement tracking is designed for group expenses. You're currently in **${persona}** mode.`,
+        generated_ui: [],
+        suggestions: ['Show spending breakdown', 'Set a budget', 'View trends'],
+        _source: 'local_genui'
+      };
+    }
+    
     // Calculate balances
     const balances = {};
-    roommates.forEach(name => { balances[name] = 0; });
+    participants.forEach(name => { balances[name] = 0; });
     
-    txns.forEach(t => {
-      balances[t.payer] += t.amount;
-      Object.entries(t.split).forEach(([person, share]) => {
-        balances[person] -= share;
-      });
+    txns.filter(t => !t.settled).forEach(t => {
+      if (t.payer && balances[t.payer] !== undefined) {
+        balances[t.payer] += t.amount;
+      }
+      if (t.split) {
+        Object.entries(t.split).forEach(([person, share]) => {
+          if (balances[person] !== undefined) {
+            balances[person] -= share;
+          }
+        });
+      }
     });
 
     const settlements = [];
@@ -380,7 +486,7 @@ export const generateLocalUI = (userMessage, transactions) => {
 
     return {
       message: settlements.length > 0 
-        ? `There are **${settlements.length} settlements** needed totaling ₹${totalOwed.toLocaleString()}.`
+        ? `There are **${settlements.length} settlements** needed totaling ${currency}${totalOwed.toLocaleString()}.`
         : `🎉 Everyone is settled up! No payments needed.`,
       generated_ui: [
         {
@@ -578,19 +684,33 @@ export const generateLocalUI = (userMessage, transactions) => {
 };
 
 /**
- * Main export: Generate UI with Thesys, fallback to local generation
+ * Main export: Generate UI with Thesys, fallback to Gemini/Local
  */
 export const generateDynamicUI = async (userMessage, transactions, context = '') => {
-  // Try Thesys first
+  // 1. Try Thesys API First (REQUIRED by Problem Statement)
   if (process.env.THESYS_API_KEY) {
     try {
+      console.log('🎨 Generating UI via Thesys GenUI API (Primary)...');
       return await generateThesysUI(userMessage, transactions, context);
     } catch (error) {
-      console.warn('Thesys failed, using local UI generation:', error.message);
+      console.warn('Thesys GenUI failed, trying fallback...', error.message);
+    }
+  } else {
+    console.warn('⚠️ THESYS_API_KEY missing! Skipping primary GenUI provider.');
+  }
+
+  // 2. Fallback to Google Gemini (Reliable backup)
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      console.log('🤖 Using Google Gemini as GenUI fallback...');
+      return await generateGeminiUI(userMessage, transactions, context);
+    } catch (error) {
+      console.warn('Gemini GenUI failed:', error.message);
     }
   }
   
-  // Fallback to local generation (same output format)
+  // 3. Fallback to local generation
+  console.log('⚠️ Using Local UI Generation fallback');
   return generateLocalUI(userMessage, transactions);
 };
 

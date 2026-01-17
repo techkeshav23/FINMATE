@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const MEMORY_FILE = join(__dirname, '../data/conversation_memory.json');
+const MEMORY_FILE = join(__dirname, '../../data/conversation_memory.json');
 
 // Default conversation context
 const defaultContext = {
@@ -54,10 +54,22 @@ const saveMemory = (context) => {
 // In-memory conversation context (per session) - loaded from disk
 let conversationContext = loadMemory();
 
-// Entity extraction patterns
-const PERSON_PATTERNS = /\b(rahul|priya|amit|keshav|john|mary|alex|sam)\b/gi;
-const CATEGORY_PATTERNS = /\b(food|groceries|utilities|rent|entertainment|transport|shopping|household|health)\b/gi;
-const TIMEFRAME_PATTERNS = /\b(today|yesterday|this week|last week|this month|last month|january|february|march|april|may|june|july|august|september|october|november|december)\b/gi;
+// Entity extraction patterns - Categories and timeframes are static, but person names will be loaded dynamically
+// IMPORTANT: Person names should be extracted from actual transaction data, not hardcoded
+let PERSON_PATTERNS = null; // Will be set dynamically based on participants
+const CATEGORY_PATTERNS = /\b(food|groceries|utilities|rent|entertainment|transport|shopping|household|health|other|misc|bills|travel|flight|hotel|accommodation|taxi|fuel|medical|insurance|subscription|salary|income|investment)\b/gi;
+const TIMEFRAME_PATTERNS = /\b(today|yesterday|this week|last week|this month|last month|january|february|march|april|may|june|july|august|september|october|november|december|q1|q2|q3|q4|this year|last year)\b/gi;
+
+// Function to set person patterns dynamically from participant list (generic - works for any persona)
+export const setParticipantPatterns = (participants) => {
+  if (participants && participants.length > 0) {
+    const names = participants.map(n => n.toLowerCase()).join('|');
+    PERSON_PATTERNS = new RegExp(`\\b(${names})\\b`, 'gi');
+  }
+};
+
+// Alias for backward compatibility
+export const setRoommatePatterns = setParticipantPatterns;
 
 // Pronouns that need context resolution
 const PRONOUN_PATTERNS = {
@@ -76,10 +88,12 @@ export const extractEntities = (message) => {
     isFollowUp: false
   };
 
-  // Extract persons
-  const personMatches = message.match(PERSON_PATTERNS);
-  if (personMatches) {
-    entities.persons = [...new Set(personMatches.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()))];
+  // Extract persons (only if pattern has been set from roommates)
+  if (PERSON_PATTERNS) {
+    const personMatches = message.match(PERSON_PATTERNS);
+    if (personMatches) {
+      entities.persons = [...new Set(personMatches.map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase()))];
+    }
   }
 
   // Extract categories
@@ -116,11 +130,25 @@ export const resolveContext = (message, entities) => {
   if (entities.hasPronouns || entities.isFollowUp) {
     let newMessage = message;
 
-    // Resolve person pronouns
+    // Resolve person pronouns (he/she/they -> last person mentioned)
     if (conversationContext.lastPerson && PRONOUN_PATTERNS.person.test(message)) {
-      newMessage = newMessage.replace(PRONOUN_PATTERNS.person, conversationContext.lastPerson);
+      // More robust pronoun replacement
+      newMessage = newMessage.replace(/\b(he|she|they)\b/gi, conversationContext.lastPerson);
+      newMessage = newMessage.replace(/\b(him|her|them)\b/gi, conversationContext.lastPerson);
+      newMessage = newMessage.replace(/\b(his|her|their)\b/gi, `${conversationContext.lastPerson}'s`);
       resolved.usedContext = true;
       resolved.contextUsed.push(`person: ${conversationContext.lastPerson}`);
+    }
+    
+    // Resolve "it/that/this" to last category or topic
+    if (conversationContext.lastCategory && /\b(it|that|this)\b/gi.test(message)) {
+      // Only replace if context makes sense
+      if (message.toLowerCase().includes('show') || message.toLowerCase().includes('more about') || 
+          message.toLowerCase().includes('details') || message.toLowerCase().includes('why')) {
+        newMessage = newMessage.replace(/\b(it|that|this)\b/gi, conversationContext.lastCategory);
+        resolved.usedContext = true;
+        resolved.contextUsed.push(`category: ${conversationContext.lastCategory}`);
+      }
     }
 
     // Handle "what about X" patterns
@@ -128,8 +156,8 @@ export const resolveContext = (message, entities) => {
     if (whatAboutMatch) {
       const subject = whatAboutMatch[1];
       
-      // Check if subject is a person name
-      if (PERSON_PATTERNS.test(subject)) {
+      // Check if subject is a person name (only if patterns loaded)
+      if (PERSON_PATTERNS && PERSON_PATTERNS.test(subject)) {
         // Keep the new person but use last intent
         if (conversationContext.lastIntent) {
           resolved.contextUsed.push(`intent: ${conversationContext.lastIntent}`);
@@ -144,11 +172,24 @@ export const resolveContext = (message, entities) => {
         }
       }
     }
+    
+    // Handle "same for X" patterns
+    const sameForMatch = message.match(/same for\s+(\w+)/i);
+    if (sameForMatch && conversationContext.lastIntent) {
+      resolved.contextUsed.push(`repeating intent: ${conversationContext.lastIntent} for ${sameForMatch[1]}`);
+      resolved.usedContext = true;
+    }
 
     // Handle "and" / "also" follow-ups
     if (/^(and|also)\s/i.test(message) && conversationContext.lastIntent) {
       resolved.usedContext = true;
       resolved.contextUsed.push(`continuing: ${conversationContext.lastIntent}`);
+    }
+    
+    // Handle timeframe carry-over
+    if (conversationContext.lastTimeframe && !entities.timeframes?.length) {
+      // If user asks about something without specifying time, use last timeframe
+      resolved.contextUsed.push(`timeframe: ${conversationContext.lastTimeframe}`);
     }
 
     resolved.resolvedMessage = newMessage;
@@ -158,7 +199,7 @@ export const resolveContext = (message, entities) => {
 };
 
 // Update context after processing a message
-export const updateContext = (intent, entities, result) => {
+export const updateContext = (intent, entities, result, userMessage) => {
   // Update last intent
   if (intent && intent !== 'unknown' && intent !== 'clarify') {
     conversationContext.lastIntent = intent;
@@ -201,15 +242,23 @@ export const updateContext = (intent, entities, result) => {
     conversationContext.frequentQueries[intent] = (conversationContext.frequentQueries[intent] || 0) + 1;
   }
   
-  // Add to conversation history (keep last 20)
+  // Add to conversation history (keep last 10 turns)
   conversationContext.conversationHistory = conversationContext.conversationHistory || [];
-  conversationContext.conversationHistory.unshift({
-    intent,
-    entities,
-    timestamp: new Date().toISOString()
-  });
-  if (conversationContext.conversationHistory.length > 20) {
-    conversationContext.conversationHistory = conversationContext.conversationHistory.slice(0, 20);
+  
+  // Clean AI response text (remove UI jargon if possible)
+  const aiText = result && result.message ? result.message : "Shown a chart";
+  
+  if (userMessage) {
+    conversationContext.conversationHistory.unshift({
+      user: userMessage,
+      assistant: aiText,
+      intent,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  if (conversationContext.conversationHistory.length > 10) {
+    conversationContext.conversationHistory = conversationContext.conversationHistory.slice(0, 10);
   }
   
   // Save to disk for persistence
@@ -219,30 +268,27 @@ export const updateContext = (intent, entities, result) => {
 // Get current context for prompts
 export const getContextSummary = () => {
   const context = [];
-
+  
+  // 1. Add Summary Metadata
   if (conversationContext.lastPerson) {
     context.push(`Last person mentioned: ${conversationContext.lastPerson}`);
   }
   if (conversationContext.lastCategory) {
     context.push(`Last category: ${conversationContext.lastCategory}`);
   }
-  if (conversationContext.lastIntent) {
-    context.push(`Last question type: ${conversationContext.lastIntent}`);
-  }
-  if (conversationContext.recentTopics.length > 0) {
-    context.push(`Recent topics: ${conversationContext.recentTopics.join(', ')}`);
-  }
   
-  // Add frequent query insight
-  if (conversationContext.frequentQueries) {
-    const topQuery = Object.entries(conversationContext.frequentQueries)
-      .sort((a, b) => b[1] - a[1])[0];
-    if (topQuery && topQuery[1] > 2) {
-      context.push(`User frequently asks about: ${topQuery[0]}`);
-    }
+  // 2. Add Actual Conversation Transcript (CRITICAL for "Chat Mode")
+  if (conversationContext.conversationHistory && conversationContext.conversationHistory.length > 0) {
+    const transcript = conversationContext.conversationHistory
+      .slice(0, 5) // Last 5 turns
+      .reverse() // As chronological order
+      .map(entry => `User: ${entry.user}\nAI: ${entry.assistant}`)
+      .join('\n\n');
+      
+    context.push(`\n=== RECENT CONVERSATION HISTORY ===\n${transcript}\n===================================`);
   }
 
-  return context.length > 0 ? context.join('. ') : 'No prior context.';
+  return context.length > 0 ? context.join('\n') : 'No prior context.';
 };
 
 // Get user preferences based on history
@@ -348,6 +394,8 @@ export default {
   updateContext,
   getContextSummary,
   clearContext,
+  setParticipantPatterns,
+  setRoommatePatterns, // Backward compatibility
   getContext,
   needsContextResolution
 };

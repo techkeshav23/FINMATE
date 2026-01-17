@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const PATTERNS_FILE = join(__dirname, '../data/learned_patterns.json');
+const PATTERNS_FILE = join(__dirname, '../../data/learned_patterns.json');
 
 // Default pattern structure
 const defaultPatterns = {
@@ -47,7 +47,8 @@ export const savePatterns = (patterns) => {
 };
 
 // Learn from transactions - build baseline patterns
-export const learnFromTransactions = (transactions, roommates) => {
+// participants = array of participant names (for group mode) or empty array (solo mode)
+export const learnFromTransactions = (transactions, participants = []) => {
   const patterns = loadPatterns();
   
   // Reset learning
@@ -55,7 +56,10 @@ export const learnFromTransactions = (transactions, roommates) => {
   patterns.categoryAverages = {};
   patterns.frequencyPatterns = {};
   
-  roommates.forEach(name => {
+  // For solo mode, use 'user' as the default participant
+  const effectiveParticipants = participants.length > 0 ? participants : ['user'];
+  
+  effectiveParticipants.forEach(name => {
     patterns.userBaselines[name] = {};
   });
   
@@ -65,7 +69,9 @@ export const learnFromTransactions = (transactions, roommates) => {
   const personCategoryTotals = {};
   
   transactions.forEach(txn => {
-    const { category, payer, amount } = txn;
+    const category = txn.category || 'Other';
+    const payer = txn.payer || 'user'; // Default to 'user' for solo mode
+    const amount = txn.amount || 0;
     
     // Category totals
     categoryTotals[category] = (categoryTotals[category] || 0) + amount;
@@ -89,15 +95,17 @@ export const learnFromTransactions = (transactions, roommates) => {
   });
   
   // User baselines per category
-  roommates.forEach(name => {
+  effectiveParticipants.forEach(name => {
     if (personCategoryTotals[name]) {
       Object.keys(personCategoryTotals[name]).forEach(category => {
-        const userCatTxns = transactions.filter(t => t.payer === name && t.category === category);
-        patterns.userBaselines[name][category] = {
-          average: Math.round(personCategoryTotals[name][category] / userCatTxns.length),
-          total: personCategoryTotals[name][category],
-          count: userCatTxns.length
-        };
+        const userCatTxns = transactions.filter(t => (t.payer || 'user') === name && (t.category || 'Other') === category);
+        if (userCatTxns.length > 0) {
+          patterns.userBaselines[name][category] = {
+            average: Math.round(personCategoryTotals[name][category] / userCatTxns.length),
+            total: personCategoryTotals[name][category],
+            count: userCatTxns.length
+          };
+        }
       });
     }
   });
@@ -105,10 +113,11 @@ export const learnFromTransactions = (transactions, roommates) => {
   // Frequency patterns (days between category transactions)
   const categoryDates = {};
   transactions.forEach(txn => {
-    if (!categoryDates[txn.category]) {
-      categoryDates[txn.category] = [];
+    const category = txn.category || 'Other';
+    if (!categoryDates[category]) {
+      categoryDates[category] = [];
     }
-    categoryDates[txn.category].push(new Date(txn.date));
+    categoryDates[category].push(new Date(txn.date));
   });
   
   Object.keys(categoryDates).forEach(category => {
@@ -207,21 +216,23 @@ export const getLearnedThresholds = (category) => {
 };
 
 // Enhanced anomaly detection using learned patterns
-export const detectAnomaliesWithLearning = (transactions, roommates) => {
+// participants = array of participant names (for group mode) or empty array (solo mode)
+export const detectAnomaliesWithLearning = (transactions, participants = []) => {
   const patterns = loadPatterns();
   const anomalies = [];
   
   // Ensure we have baselines
   if (Object.keys(patterns.categoryAverages).length === 0) {
-    learnFromTransactions(transactions, roommates);
+    learnFromTransactions(transactions, participants);
   }
   
   // Get recent transactions
   const recentTxns = transactions.slice(-15);
   
   recentTxns.forEach(txn => {
-    const thresholdData = getLearnedThresholds(txn.category);
-    const baseline = patterns.categoryAverages[txn.category];
+    const category = txn.category || 'Other';
+    const thresholdData = getLearnedThresholds(category);
+    const baseline = patterns.categoryAverages[category];
     
     if (!baseline) return;
     
