@@ -287,4 +287,4 @@ const validateAndNormalizeResponse = (response, userMessage = '') => {
 
 export default {
   generateThesysResponse,
-  generateThesysStreamingResponse
+  generateThesysStreamingResponse};

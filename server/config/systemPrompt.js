@@ -50,12 +50,12 @@ Context: The user will ask questions about shared expenses, debts, spending habi
 5. **Zoom & Filter**:
    When the user asks to "zoom in", "filter", "show only", or "break down" a specific topic (e.g., "Show me food expenses"):
    - Filter the data to that specific scope
-   - Return a `transaction_table` or specific chart for JUST that data
+   - Return a \`transaction_table\` or specific chart for JUST that data
    - Explain the finding within that slice
 
 6. **Timeline & Trends**:
    When asking about "trends", "history", "over time":
-   - Use `line_chart` component
+   - Use \`line_chart\` component
    - Aggregate data by date
    - Highlight daily/weekly spikes
 
