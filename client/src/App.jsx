@@ -133,7 +133,7 @@ function App() {
   const userMessages = messages.filter(m => m.role === 'user');
 
   return (
-    <div className="flex h-screen bg-dark-900 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         chatHistory={userMessages}

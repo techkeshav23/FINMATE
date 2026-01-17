@@ -1,4 +1,4 @@
-import { User, Sparkles } from 'lucide-react';
+import { User, MessageSquare } from 'lucide-react';
 import DynamicComponentRenderer from './DynamicComponentRenderer';
 import ConfidenceBadge from './ConfidenceBadge';
 import ReasoningSteps from './ReasoningSteps';
@@ -23,7 +23,7 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
     return parts.map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
         return (
-          <strong key={index} className="text-primary-400 font-semibold">
+          <strong key={index} className="text-primary-600 font-semibold">
             {part.slice(2, -2)}
           </strong>
         );
@@ -39,28 +39,28 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
   };
 
   return (
-    <div className={`flex items-start gap-3 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
+    <div className={`flex items-start gap-2 sm:gap-3 animate-fade-in ${isUser ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+      <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
         isUser 
-          ? 'bg-dark-700' 
-          : 'bg-gradient-to-br from-primary-400 to-primary-600'
+          ? 'bg-gray-200' 
+          : 'bg-primary-500'
       }`}>
         {isUser ? (
-          <User className="w-4 h-4 text-dark-300" />
+          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-600" />
         ) : (
-          <Sparkles className="w-4 h-4 text-white" />
+          <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
         )}
       </div>
 
       {/* Message Content */}
-      <div className={`flex flex-col max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
-        <div className={`rounded-2xl px-4 py-3 shadow-sm ${
+      <div className={`flex flex-col max-w-[85%] sm:max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
+        <div className={`rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 ${
           isUser 
-            ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-br-md border border-primary-500/20' 
-            : 'glass text-slate-100 rounded-bl-md'
+            ? 'bg-primary-500 text-white rounded-br-md' 
+            : 'bg-white text-gray-800 rounded-bl-md border border-gray-200 shadow-sm'
         }`}>
-          <div className="markdown-content whitespace-pre-wrap leading-relaxed">
+          <div className="markdown-content whitespace-pre-wrap leading-relaxed text-sm">
             {parseContent(message.content)}
           </div>
         </div>
@@ -91,7 +91,7 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
               <button
                 key={idx}
                 onClick={() => onSuggestionClick(suggestion)}
-                className="px-3 py-1.5 text-xs text-primary-400 bg-dark-800 hover:bg-dark-700 rounded-full border border-dark-700 hover:border-primary-500/50 transition-all duration-200"
+                className="px-3 py-1.5 text-xs text-primary-600 bg-primary-50 hover:bg-primary-100 rounded-full border border-primary-200 transition-colors"
               >
                 {suggestion}
               </button>
@@ -100,8 +100,8 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
         )}
 
         {/* Timestamp and Confidence */}
-        <div className="flex items-center gap-2 mt-1">
-          <span className="text-xs text-dark-500">
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="text-xs text-gray-400">
             {new Date(message.timestamp).toLocaleTimeString([], { 
               hour: '2-digit', 
               minute: '2-digit' 

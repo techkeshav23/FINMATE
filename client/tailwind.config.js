@@ -7,62 +7,51 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Cal Sans', 'Inter', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       colors: {
-        // Premium "Fintech" Violet-Blue Palette
+        // Google Blue - Primary brand color
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6', // Trusted Blue
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
-          950: '#172554',
+          50: '#e8f0fe',
+          100: '#d2e3fc',
+          200: '#aecbfa',
+          300: '#8ab4f8',
+          400: '#669df6',
+          500: '#1a73e8', // Google Blue
+          600: '#1967d2',
+          700: '#185abc',
+          800: '#174ea6',
+          900: '#1a4796',
         },
-        // Rich "Midnight" Darks (Deep Slate/Blue-Grey)
-        dark: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',  // Card Backgrounds
-          900: '#0f172a',  // Context Backgrounds
-          950: '#020617',  // Main Background
+        // Clean neutrals - Google/Microsoft style
+        gray: {
+          50: '#f8f9fa',   // Background
+          100: '#f1f3f4',  // Hover states
+          200: '#e8eaed',  // Borders light
+          300: '#dadce0',  // Borders
+          400: '#bdc1c6',  // Disabled text
+          500: '#9aa0a6',  // Secondary text
+          600: '#80868b',  // Placeholder
+          700: '#5f6368',  // Body text
+          800: '#3c4043',  // Strong text
+          900: '#202124',  // Headings
         },
-        // Semantic Colors
-        success: '#10b981', // Emerald
-        warning: '#f59e0b', // Amber
-        danger: '#ef4444',  // Red
+        // Semantic colors - Google style
+        success: '#34a853', // Google Green
+        warning: '#fbbc04', // Google Yellow
+        danger: '#ea4335',  // Google Red
+        info: '#4285f4',    // Google Blue alt
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ba 180deg, #e92a67 360deg)',
+      boxShadow: {
+        'sm': '0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.08)',
+        'md': '0 1px 3px 0 rgba(60, 64, 67, 0.15), 0 4px 8px 3px rgba(60, 64, 67, 0.1)',
+        'lg': '0 3px 6px 0 rgba(60, 64, 67, 0.15), 0 8px 16px 6px rgba(60, 64, 67, 0.1)',
       },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+        '3xl': '24px',
       },
-    },
-  },
-  plugins: [],
-}          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        }
-      },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'bounce-slow': 'bounce 2s infinite',
-      }
     },
   },
   plugins: [],
