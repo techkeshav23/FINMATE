@@ -4,7 +4,8 @@ import axios from 'axios';
 import { generatePromptWithData } from '../config/systemPrompt.js';
 
 // Thesys API endpoint - Using OpenAI-compatible endpoint
-const THESYS_API_URL = process.env.THESYS_API_URL || 'https://api.thesys.dev/v1/generate';
+const THESYS_BASE_URL = process.env.THESYS_API_URL || 'https://api.thesys.dev/v1/embed';
+const THESYS_API_URL = `${THESYS_BASE_URL}/chat/completions`;
 
 // Enhanced GenUI System Prompt for dynamic component generation
 const GENUI_SYSTEM_PROMPT = `You are a financial UI generator for a roommate expense sharing app called "FairShare".
@@ -72,7 +73,7 @@ GENERATE A DYNAMIC, DATA-DRIVEN RESPONSE:`;
     const response = await axios.post(
       THESYS_API_URL,
       {
-        model: process.env.THESYS_MODEL || "thesys-genui-1",
+        model: process.env.THESYS_MODEL || "c1/google/gemini-3-flash/v-20251230",
         messages: [
           { 
             role: "system", 
@@ -158,7 +159,7 @@ export const generateThesysStreamingResponse = async (userMessage, transactions,
     const response = await axios.post(
       THESYS_API_URL,
       {
-        model: process.env.THESYS_MODEL || "thesys-genui-1",
+        model: process.env.THESYS_MODEL || "c1/google/gemini-3-flash/v-20251230",
         messages: [
           { role: "system", content: `${GENUI_SYSTEM_PROMPT}\n\n${dataContext}` },
           { role: "user", content: userMessage }
