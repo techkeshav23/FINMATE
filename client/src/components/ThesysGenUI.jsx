@@ -12,8 +12,76 @@ import {
   ChevronRight, ChevronDown, Info, Sparkles, Zap, BarChart2, PieChartIcon
 } from 'lucide-react';
 
-// Color palette for generated charts
+// Color palette for generated charts - vibrant colors for dark theme
 const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+
+// Color normalization - convert unsafe colors to visible ones on dark background
+const UNSAFE_COLORS = ['black', '#000', '#000000', '#111', '#222', '#1a1a1a', 'rgb(0,0,0)', 'dark', 'transparent'];
+const COLOR_MAP = {
+  // Black/dark to light
+  'black': '#e2e8f0',
+  '#000': '#e2e8f0',
+  '#000000': '#e2e8f0',
+  '#111': '#e2e8f0',
+  '#222': '#94a3b8',
+  // Semantic colors for dark theme
+  'red': '#ef4444',
+  'green': '#22c55e',
+  'blue': '#3b82f6',
+  'yellow': '#f59e0b',
+  'orange': '#f97316',
+  'purple': '#8b5cf6',
+  'pink': '#ec4899',
+  'gray': '#94a3b8',
+  'white': '#ffffff',
+  // Common low-contrast fixes
+  'text-black': 'text-white',
+  'text-gray-900': 'text-white',
+  'text-gray-800': 'text-gray-100',
+  'bg-white': 'bg-dark-800',
+  'bg-gray-100': 'bg-dark-700',
+};
+
+// Sanitize color value for dark theme visibility
+const sanitizeColor = (color) => {
+  if (!color) return null;
+  const colorLower = color.toLowerCase().trim();
+  
+  // Check if it's an unsafe color
+  if (UNSAFE_COLORS.some(unsafe => colorLower.includes(unsafe))) {
+    return COLOR_MAP[colorLower] || '#e2e8f0'; // Default to light gray
+  }
+  
+  // Check color map
+  if (COLOR_MAP[colorLower]) {
+    return COLOR_MAP[colorLower];
+  }
+  
+  // Return original if it seems safe
+  return color;
+};
+
+// Sanitize Tailwind class for dark theme
+const sanitizeTextClass = (className) => {
+  if (!className) return 'text-white';
+  
+  // Fix common problematic classes
+  const fixes = {
+    'text-black': 'text-white',
+    'text-gray-900': 'text-white',
+    'text-gray-800': 'text-gray-100',
+    'text-gray-700': 'text-gray-200',
+    'text-dark': 'text-white',
+  };
+  
+  for (const [bad, good] of Object.entries(fixes)) {
+    if (className.includes(bad)) {
+      return className.replace(bad, good);
+    }
+  }
+  
+  return className;
+};
 
 // Icon mapping for dynamic icon rendering
 const ICON_MAP = {
@@ -41,9 +109,9 @@ const DynamicText = ({ spec }) => {
   const { text, style = 'normal', color, size = 'base', highlight } = spec;
   
   const textClasses = {
-    normal: 'text-dark-300',
+    normal: 'text-gray-200',
     bold: 'font-bold text-white',
-    muted: 'text-dark-500',
+    muted: 'text-gray-400',
     accent: 'text-primary-400',
     warning: 'text-amber-400',
     success: 'text-green-400',
@@ -59,9 +127,16 @@ const DynamicText = ({ spec }) => {
     '2xl': 'text-2xl'
   };
   
+  // Handle custom color - sanitize for dark theme
+  const customStyle = color ? { color: sanitizeColor(color) } : {};
+  const baseClass = textClasses[style] || textClasses.normal;
+  
   return (
-    <span className={`${textClasses[style] || textClasses.normal} ${sizeClasses[size]}`}>
-      {highlight ? <mark className="bg-primary-500/20 px-1 rounded">{text}</mark> : text}
+    <span 
+      className={`${color ? '' : baseClass} ${sizeClasses[size]}`}
+      style={customStyle}
+    >
+      {highlight ? <mark className="bg-primary-500/20 px-1 rounded text-white">{text}</mark> : text}
     </span>
   );
 };
@@ -81,10 +156,10 @@ const DynamicMetricCard = ({ spec, onAction }) => {
           <div className="p-2 bg-primary-500/10 rounded-lg">
             <Icon className="w-4 h-4 text-primary-400" />
           </div>
-          <span className="text-xs text-dark-400 uppercase tracking-wide">{label}</span>
+          <span className="text-xs text-gray-400 uppercase tracking-wide">{label}</span>
         </div>
         {change !== undefined && (
-          <div className={`flex items-center gap-1 text-xs ${changeType === 'positive' ? 'text-green-400' : changeType === 'negative' ? 'text-red-400' : 'text-dark-400'}`}>
+          <div className={`flex items-center gap-1 text-xs ${changeType === 'positive' ? 'text-green-400' : changeType === 'negative' ? 'text-red-400' : 'text-gray-400'}`}>
             {changeType === 'positive' ? <TrendingUp className="w-3 h-3" /> : changeType === 'negative' ? <TrendingDown className="w-3 h-3" /> : null}
             <span>{change > 0 ? '+' : ''}{change}%</span>
           </div>
@@ -92,9 +167,9 @@ const DynamicMetricCard = ({ spec, onAction }) => {
       </div>
       <div className="mt-3">
         <p className="text-2xl font-bold text-white">{typeof value === 'number' ? `₹${value.toLocaleString()}` : value}</p>
-        {subtext && <p className="text-xs text-dark-500 mt-1">{subtext}</p>}
+        {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
         {comparison && (
-          <p className="text-xs text-dark-400 mt-2 flex items-center gap-1">
+          <p className="text-xs text-gray-300 mt-2 flex items-center gap-1">
             <Info className="w-3 h-3" />
             {comparison}
           </p>
@@ -140,7 +215,7 @@ const DynamicChart = ({ spec, onDrillDown }) => {
             {type === 'line' && <TrendingUp className="w-4 h-4 text-primary-400" />}
             {title}
           </h3>
-          {subtitle && <p className="text-xs text-dark-500 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
         </div>
       )}
       
@@ -150,7 +225,9 @@ const DynamicChart = ({ spec, onDrillDown }) => {
             <XAxis dataKey={chartConfig.xKey} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
             <Tooltip 
-              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0' }}
+              itemStyle={{ color: '#e2e8f0' }}
+              labelStyle={{ color: '#94a3b8' }}
               formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']}
             />
             <Bar dataKey={chartConfig.yKey} radius={[4, 4, 0, 0]} animationDuration={chartConfig.animate ? 800 : 0}>
@@ -175,10 +252,12 @@ const DynamicChart = ({ spec, onDrillDown }) => {
               {data.map((_, i) => <Cell key={i} fill={chartConfig.colors[i % chartConfig.colors.length]} />)}
             </Pie>
             <Tooltip 
-              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0' }}
+              itemStyle={{ color: '#e2e8f0' }}
+              labelStyle={{ color: '#94a3b8' }}
               formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']}
             />
-            {chartConfig.showLegend && <Legend formatter={(value) => <span className="text-dark-300 text-xs">{value}</span>} />}
+            {chartConfig.showLegend && <Legend formatter={(value) => <span className="text-gray-300 text-xs">{value}</span>} />}
           </PieChart>
         ) : type === 'line' || type === 'area' ? (
           <AreaChart data={data} onClick={handleClick} style={{ cursor: drillDownEnabled ? 'pointer' : 'default' }}>
@@ -186,7 +265,9 @@ const DynamicChart = ({ spec, onDrillDown }) => {
             <XAxis dataKey={chartConfig.xKey} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11 }} tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`} />
             <Tooltip 
-              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px' }}
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0' }}
+              itemStyle={{ color: '#e2e8f0' }}
+              labelStyle={{ color: '#94a3b8' }}
               formatter={(v) => [`₹${v.toLocaleString()}`, 'Amount']}
             />
             <Area type="monotone" dataKey={chartConfig.yKey} stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} animationDuration={chartConfig.animate ? 800 : 0} />
@@ -195,7 +276,7 @@ const DynamicChart = ({ spec, onDrillDown }) => {
       </ResponsiveContainer>
       
       {drillDownEnabled && (
-        <p className="text-xs text-dark-500 mt-3 text-center">Click any element to explore further</p>
+        <p className="text-xs text-gray-500 mt-3 text-center">Click any element to explore further</p>
       )}
     </div>
   );
@@ -209,7 +290,7 @@ const DynamicList = ({ spec, onAction }) => {
     return emptyMessage ? (
       <div className="bg-dark-800 rounded-xl p-4 border border-dark-700 text-center">
         <CheckCircle className="w-8 h-8 text-primary-400 mx-auto mb-2" />
-        <p className="text-dark-400">{emptyMessage}</p>
+        <p className="text-gray-400">{emptyMessage}</p>
       </div>
     ) : null;
   }
@@ -229,7 +310,7 @@ const DynamicList = ({ spec, onAction }) => {
             onClick={() => item.action && onAction && onAction(item.action)}
           >
             {showIndex && (
-              <span className="w-6 h-6 rounded-full bg-dark-700 flex items-center justify-center text-xs text-dark-400">
+              <span className="w-6 h-6 rounded-full bg-dark-700 flex items-center justify-center text-xs text-gray-400">
                 {idx + 1}
               </span>
             )}
@@ -240,15 +321,18 @@ const DynamicList = ({ spec, onAction }) => {
             )}
             <div className="flex-1 min-w-0">
               <p className="text-sm text-white truncate">{item.title || item.text}</p>
-              {item.subtitle && <p className="text-xs text-dark-400 truncate">{item.subtitle}</p>}
+              {item.subtitle && <p className="text-xs text-gray-400 truncate">{item.subtitle}</p>}
             </div>
             {item.value !== undefined && (
-              <span className={`text-sm font-medium ${item.valueColor || 'text-white'}`}>
+              <span 
+                className={`text-sm font-medium ${sanitizeTextClass(item.valueColor) || 'text-white'}`}
+                style={item.valueColor && !item.valueColor.startsWith('text-') ? { color: sanitizeColor(item.valueColor) } : {}}
+              >
                 {typeof item.value === 'number' ? `₹${item.value.toLocaleString()}` : item.value}
               </span>
             )}
             {item.badge && (
-              <span className={`text-xs px-2 py-0.5 rounded-full ${item.badgeColor || 'bg-primary-500/20 text-primary-400'}`}>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${sanitizeTextClass(item.badgeColor) || 'bg-primary-500/20 text-primary-400'}`}>
                 {item.badge}
               </span>
             )}
@@ -281,9 +365,9 @@ const DynamicInsightCard = ({ spec, onAction }) => {
         <Icon className={`w-5 h-5 ${style.iconColor} flex-shrink-0 mt-0.5`} />
         <div className="flex-1">
           <p className="text-sm text-white font-medium">{insight}</p>
-          {explanation && <p className="text-xs text-dark-400 mt-1">{explanation}</p>}
+          {explanation && <p className="text-xs text-gray-300 mt-1">{explanation}</p>}
           {confidence && (
-            <p className="text-xs text-dark-500 mt-2">
+            <p className="text-xs text-gray-400 mt-2">
               Confidence: <span className={confidence === 'high' ? 'text-green-400' : confidence === 'medium' ? 'text-amber-400' : 'text-red-400'}>{confidence}</span>
             </p>
           )}
@@ -315,11 +399,11 @@ const DynamicComparison = ({ spec }) => {
       )}
       <div className="grid grid-cols-2 divide-x divide-dark-700">
         <div className="p-3">
-          <p className="text-xs text-dark-500 text-center mb-2">{left.label}</p>
+          <p className="text-xs text-gray-400 text-center mb-2">{left.label}</p>
           <p className="text-xl font-bold text-white text-center">{typeof left.value === 'number' ? `₹${left.value.toLocaleString()}` : left.value}</p>
         </div>
         <div className="p-3">
-          <p className="text-xs text-dark-500 text-center mb-2">{right.label}</p>
+          <p className="text-xs text-gray-400 text-center mb-2">{right.label}</p>
           <p className="text-xl font-bold text-white text-center">{typeof right.value === 'number' ? `₹${right.value.toLocaleString()}` : right.value}</p>
         </div>
       </div>
@@ -327,8 +411,8 @@ const DynamicComparison = ({ spec }) => {
         <div className="p-3 border-t border-dark-700 space-y-2">
           {metrics.map((m, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-dark-400">{m.label}</span>
-              <span className={m.change > 0 ? 'text-red-400' : m.change < 0 ? 'text-green-400' : 'text-dark-300'}>
+              <span className="text-gray-400">{m.label}</span>
+              <span className={m.change > 0 ? 'text-red-400' : m.change < 0 ? 'text-green-400' : 'text-gray-300'}>
                 {m.change > 0 ? '+' : ''}{m.change}% {m.direction}
               </span>
             </div>
@@ -384,9 +468,9 @@ const DynamicFlow = ({ spec, onAction }) => {
               {idx < currentStep ? <CheckCircle className="w-4 h-4" /> : <span className="text-xs">{idx + 1}</span>}
             </div>
             <div className="flex-1">
-              <p className={`text-sm ${idx === currentStep ? 'text-white' : 'text-dark-400'}`}>{step.title}</p>
+              <p className={`text-sm ${idx === currentStep ? 'text-white' : 'text-gray-400'}`}>{step.title}</p>
               {step.detail && idx === currentStep && (
-                <p className="text-xs text-dark-500 mt-1">{step.detail}</p>
+                <p className="text-xs text-gray-400 mt-1">{step.detail}</p>
               )}
               {step.action && idx === currentStep && (
                 <button
@@ -407,7 +491,7 @@ const DynamicFlow = ({ spec, onAction }) => {
         <div className="p-3 border-t border-dark-700">
           <button 
             onClick={() => setCurrentStep(steps.length)}
-            className="text-xs text-dark-500 hover:text-dark-300"
+            className="text-xs text-gray-500 hover:text-gray-300"
           >
             Skip all steps
           </button>

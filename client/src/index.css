@@ -22,6 +22,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Safe area for iOS devices with notch */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
 /* Clean card style - Google/Microsoft inspired */
 .card {
   background: #ffffff;

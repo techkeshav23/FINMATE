@@ -3,6 +3,8 @@ import { Sidebar } from './components/layout';
 import ChatWindow from './components/ChatWindow';
 import { chatAPI, transactionsAPI } from './services/api';
 import { useLocalStorage, useUploadedFiles } from './hooks';
+import { BottomNav } from './components/mobile';
+import { HomeTab, UploadTab, ProfileTab } from './components/pages';
 
 /**
  * FinMate App - AI Financial Assistant
@@ -13,6 +15,7 @@ import { useLocalStorage, useUploadedFiles } from './hooks';
  * - Proactive insights on first load
  * - Persona-aware responses
  * - Easy file management via sidebar
+ * - Mobile-first with bottom navigation
  */
 function App() {
   // Persisted states
@@ -29,6 +32,12 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [error, setError] = useState(null);
   const [activePersona, setActivePersona] = useState(savedPersona);
+  
+  // Tab navigation state
+  const [activeTab, setActiveTab] = useState('home');
+  
+  // Transaction count for HomeTab
+  const [transactionCount, setTransactionCount] = useState(0);
 
   // Save messages to localStorage when they change
   useEffect(() => {
@@ -45,6 +54,10 @@ function App() {
   const loadInitialData = async () => {
     setIsInitialLoading(true);
     try {
+      // Get transaction count for HomeTab
+      const stats = await transactionsAPI.getStats();
+      setTransactionCount(stats?.transactionCount || 0);
+      
       const history = await chatAPI.getHistory();
       if (history && history.length > 0) {
         // Has chat history - show it
@@ -269,44 +282,110 @@ function App() {
   // Callback for when file is uploaded (called from ChatWindow/CSVUpload)
   const handleFileUploaded = useCallback((fileInfo) => {
     addFile(fileInfo);
+    // Update transaction count
+    setTransactionCount(prev => prev + (fileInfo.transactionCount || 0));
   }, [addFile]);
+
+  // Handle tab navigation
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+    // Close sidebar when changing tabs on mobile
+    setSidebarOpen(false);
+  }, []);
+
+  // Render active tab content
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <HomeTab
+            transactionCount={transactionCount}
+            uploadedFilesCount={uploadedFiles.length}
+            onNavigate={handleTabChange}
+            userName="Keshav Upadhyay"
+          />
+        );
+      case 'upload':
+        return (
+          <UploadTab
+            onUploadSuccess={(result, fileInfo) => {
+              handleFileUploaded(fileInfo);
+              // Switch to chat after upload
+              setActiveTab('chat');
+              // Send analysis message
+              handleSendMessage(`I just uploaded ${result.added} transactions. Can you give me a quick summary?`);
+            }}
+            onParseSuccess={(result, fileInfo) => {
+              handleFileUploaded(fileInfo);
+              setActiveTab('chat');
+              handleSendMessage(`I imported ${result.added} transactions. What patterns do you see?`);
+            }}
+          />
+        );
+      case 'profile':
+        return (
+          <ProfileTab
+            userName="Keshav Upadhyay"
+            uploadedFiles={uploadedFiles}
+            onDeleteFile={handleDeleteFile}
+            onDataChanged={handleDataChanged}
+            persona={activePersona}
+          />
+        );
+      case 'chat':
+      default:
+        return (
+          <ChatWindow
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isLoading={isLoading}
+            isInitialLoading={isInitialLoading}
+            activePersona={activePersona}
+            error={error}
+            onFileUploaded={handleFileUploaded}
+          />
+        );
+    }
+  };
 
   return (
     <div className="flex h-screen bg-white overflow-hidden">
-      {/* Sidebar */}
-      <Sidebar
-        chatHistory={userMessages}
-        onNewChat={handleNewChat}
-        onClearHistory={handleClearHistory}
-        onDeleteChat={handleDeleteChat}
-        isOpen={sidebarOpen}
-        onToggle={handleToggleSidebar}
-        userName="Keshav Upadhyay"
-        onDataChanged={handleDataChanged}
-        uploadedFiles={uploadedFiles}
-        onDeleteFile={handleDeleteFile}
-      />
+      {/* Sidebar - Desktop only */}
+      <div className="hidden lg:block">
+        <Sidebar
+          chatHistory={userMessages}
+          onNewChat={handleNewChat}
+          onClearHistory={handleClearHistory}
+          onDeleteChat={handleDeleteChat}
+          isOpen={sidebarOpen}
+          onToggle={handleToggleSidebar}
+          userName="Keshav Upadhyay"
+          onDataChanged={handleDataChanged}
+          uploadedFiles={uploadedFiles}
+          onDeleteFile={handleDeleteFile}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
+      </div>
 
-      {/* Main Chat Area */}
-      <main className="flex-1 flex flex-col min-w-0">
-        {/* Persona indicator (subtle) */}
-        {activePersona && (
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
+        {/* Persona indicator (subtle) - only show on chat tab */}
+        {activePersona && activeTab === 'chat' && (
           <div className="px-4 py-1 bg-primary-50 border-b border-primary-100 text-xs text-primary-600 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
             Mode: {getPersonaDisplayName()}
           </div>
         )}
         
-        <ChatWindow
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isLoading={isLoading}
-          isInitialLoading={isInitialLoading}
-          activePersona={activePersona}
-          error={error}
-          onFileUploaded={handleFileUploaded}
-        />
+        {/* Tab Content */}
+        <div className="flex-1 overflow-hidden">
+          {renderTabContent()}
+        </div>
       </main>
+
+      {/* Bottom Navigation - Mobile only */}
+      <BottomNav activeTab={activeTab} onTabChange={handleTabChange} />
     </div>
   );
 }
