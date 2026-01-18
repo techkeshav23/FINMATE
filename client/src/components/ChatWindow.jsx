@@ -174,7 +174,7 @@ const ChatWindow = ({
                     onClick={() => handleSuggestionClick(suggestion)}
                     className="flex items-center gap-2 px-4 py-3 text-sm text-left text-gray-700 bg-white hover:bg-primary-50 rounded-xl border border-gray-200 hover:border-primary-300 transition-all duration-150 group"
                   >
-                    <Icon className="w-4 h-4 text-gray-400 group-hover:text-primary-500 flex-shrink-0" />
+                    <Icon className="w-4 h-4 text-gray-600 group-hover:text-primary-500 flex-shrink-0" />
                     <span className="truncate">{suggestion.text}</span>
                   </button>
                 );
@@ -182,7 +182,7 @@ const ChatWindow = ({
             </div>
 
             {/* Import options */}
-            <div className="flex items-center gap-3 text-xs text-gray-400">
+            <div className="flex items-center gap-3 text-xs text-gray-600">
               <button
                 onClick={() => setShowUpload(true)}
                 className="flex items-center gap-1 hover:text-primary-500 transition-colors"
@@ -298,7 +298,7 @@ const ChatWindow = ({
             </button>
           </div>
         </form>
-        <p className="text-xs text-gray-400 text-center mt-2 hidden sm:block">
+        <p className="text-xs text-gray-600 text-center mt-2 hidden sm:block">
           FinMate can make mistakes. Verify important financial information.
         </p>
       </div>

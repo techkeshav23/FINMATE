@@ -114,7 +114,7 @@ const MessageBubble = ({ message, onSuggestionClick }) => {
 
         {/* Timestamp and Confidence */}
         <div className="flex items-center gap-2 mt-1.5">
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-600">
             {new Date(message.timestamp).toLocaleTimeString([], { 
               hour: '2-digit', 
               minute: '2-digit' 

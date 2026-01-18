@@ -127,7 +127,7 @@ const Sidebar = ({
         <div className="flex-1 overflow-y-auto px-3 custom-scrollbar">
           {activeTab === 'chat' && (
             <>
-              <div className="text-xs font-medium text-gray-400 px-3 mb-2 uppercase tracking-wider">
+              <div className="text-xs font-medium text-gray-600 px-3 mb-2 uppercase tracking-wider">
                 Today
               </div>
               
@@ -145,7 +145,7 @@ const Sidebar = ({
                         role="button"
                         tabIndex={0}
                       >
-                        <MessageSquare className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <MessageSquare className="w-4 h-4 text-gray-600 flex-shrink-0" />
                         <span className="truncate flex-1">
                           {contentText.substring(0, 24) || 'New conversation'}...
                         </span>
@@ -170,7 +170,7 @@ const Sidebar = ({
                 </div>
               ) : (
                 <div className="px-3 py-4 text-sm text-gray-500 flex flex-col items-center text-center">
-                  <MessageSquare className="w-8 h-8 text-gray-300 mb-2" />
+                  <MessageSquare className="w-8 h-8 text-gray-700 mb-2" />
                   <span className="italic">No chat history yet.</span>
                   <span className="text-xs mt-1">Start a conversation!</span>
                 </div>
@@ -205,13 +205,13 @@ const Sidebar = ({
               onClick={() => onTabChange?.('profile')}
               className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors text-left"
             >
-              <div className="w-6 h-6 rounded-sm bg-purple-600 flex items-center justify-center text-xs font-bold text-white">
+              <div className="w-6 h-6 rounded-sm bg-purple-600 flex items-center justify-center text-xs font-bold text-gray-900">
                 {userInitial}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium truncate">{userName}</div>
               </div>
-              <Settings className="w-4 h-4 text-gray-400" />
+              <Settings className="w-4 h-4 text-gray-600" />
             </button>
           </div>
         </div>

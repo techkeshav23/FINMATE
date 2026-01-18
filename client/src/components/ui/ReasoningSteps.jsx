@@ -31,53 +31,53 @@ const ReasoningSteps = ({ reasoning }) => {
       case 'analysis': return <Brain className="w-3.5 h-3.5 text-purple-400" />;
       case 'insight': return <Lightbulb className="w-3.5 h-3.5 text-amber-400" />;
       case 'warning': return <AlertTriangle className="w-3.5 h-3.5 text-red-400" />;
-      default: return <CheckCircle2 className="w-3.5 h-3.5 text-primary-400" />;
+      default: return <CheckCircle2 className="w-3.5 h-3.5 text-primary-600" />;
     }
   };
 
   return (
-    <div className="mt-3 border border-dark-700 rounded-lg overflow-hidden">
+    <div className="mt-3 border border-gray-200 rounded-lg overflow-hidden">
       {/* Toggle Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full px-3 py-2 flex items-center justify-between bg-dark-800/50 hover:bg-dark-800 transition-colors"
+        className="w-full px-3 py-2 flex items-center justify-between bg-white/50 hover:bg-white transition-colors"
         aria-expanded={isExpanded}
         aria-label="Show reasoning process"
       >
         <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-primary-400" />
-          <span className="text-xs font-medium text-dark-300">How I figured this out</span>
-          <span className="text-xs text-dark-500">({steps.length} steps)</span>
+          <Brain className="w-4 h-4 text-primary-600" />
+          <span className="text-xs font-medium text-gray-700">How I figured this out</span>
+          <span className="text-xs text-gray-500">({steps.length} steps)</span>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-dark-500" />
+          <ChevronUp className="w-4 h-4 text-gray-500" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-dark-500" />
+          <ChevronDown className="w-4 h-4 text-gray-500" />
         )}
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="p-3 bg-dark-900/50 space-y-4 animate-fade-in">
+        <div className="p-3 bg-gray-50/50 space-y-4 animate-fade-in">
           {/* Reasoning Steps */}
           <div className="space-y-2">
-            <h4 className="text-xs font-medium text-dark-400 uppercase tracking-wide">My Reasoning</h4>
+            <h4 className="text-xs font-medium text-gray-600 uppercase tracking-wide">My Reasoning</h4>
             <div className="space-y-2">
               {steps.map((step, idx) => (
                 <div 
                   key={idx} 
-                  className="flex items-start gap-2 p-2 bg-dark-800/50 rounded-lg"
+                  className="flex items-start gap-2 p-2 bg-white/50 rounded-lg"
                 >
                   <div className="mt-0.5">
                     {getStepIcon(step.type)}
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs text-dark-300">{step.text}</p>
+                    <p className="text-xs text-gray-700">{step.text}</p>
                     {step.data && (
-                      <p className="text-xs text-primary-400 mt-1 font-mono">{step.data}</p>
+                      <p className="text-xs text-primary-600 mt-1 font-mono">{step.data}</p>
                     )}
                   </div>
-                  <span className="text-[10px] text-dark-600 font-mono">#{idx + 1}</span>
+                  <span className="text-[10px] text-gray-600 font-mono">#{idx + 1}</span>
                 </div>
               ))}
             </div>
@@ -92,7 +92,7 @@ const ReasoningSteps = ({ reasoning }) => {
               </h4>
               <ul className="space-y-1">
                 {assumptions.map((assumption, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs text-dark-400">
+                  <li key={idx} className="flex items-start gap-2 text-xs text-gray-600">
                     <span className="text-amber-400">•</span>
                     {assumption}
                   </li>
@@ -110,7 +110,7 @@ const ReasoningSteps = ({ reasoning }) => {
               </h4>
               <ul className="space-y-1">
                 {uncertainties.map((uncertainty, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-xs text-dark-400">
+                  <li key={idx} className="flex items-start gap-2 text-xs text-gray-600">
                     <span className="text-red-400">•</span>
                     {uncertainty}
                   </li>
@@ -121,7 +121,7 @@ const ReasoningSteps = ({ reasoning }) => {
 
           {/* Conclusion */}
           {conclusion && (
-            <div className="pt-3 border-t border-dark-700">
+            <div className="pt-3 border-t border-gray-200">
               <div className="p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg">
                 <p className="text-xs text-primary-300">
                   <span className="font-medium">Therefore: </span>

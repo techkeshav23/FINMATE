@@ -60,7 +60,7 @@ const HomeTab = ({
 
       {/* Quick Actions */}
       <div className="w-full max-w-sm space-y-3">
-        <p className="text-xs text-gray-400 uppercase tracking-wider text-center mb-2">
+        <p className="text-xs text-gray-600 uppercase tracking-wider text-center mb-2">
           Quick Actions
         </p>
         
@@ -82,7 +82,7 @@ const HomeTab = ({
       </div>
 
       {/* Tagline */}
-      <div className="mt-8 flex items-center gap-2 text-xs text-gray-400">
+      <div className="mt-8 flex items-center gap-2 text-xs text-gray-600">
         <Sparkles className="w-3 h-3" />
         <span>Powered by Thesys AI</span>
       </div>

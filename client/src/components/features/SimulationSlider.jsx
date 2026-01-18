@@ -75,41 +75,41 @@ const SimulationSlider = ({ data, onSimulate }) => {
   if (!data || !categories.length) return null;
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-dark-700 bg-gradient-to-r from-purple-600/10 to-transparent">
+      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-600/10 to-transparent">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="w-5 h-5 text-purple-400" />
-            <h3 className="font-medium text-white">{data.title || 'Budget Simulator'}</h3>
+            <h3 className="font-medium text-gray-900">{data.title || 'Budget Simulator'}</h3>
           </div>
           <button
             onClick={resetAdjustments}
-            className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
+            className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             title="Reset all adjustments"
             aria-label="Reset adjustments"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
-        <p className="text-xs text-dark-400 mt-1">
+        <p className="text-xs text-gray-600 mt-1">
           Adjust categories to see potential savings
         </p>
       </div>
 
       {/* Goal Progress */}
       {data.goalAmount && (
-        <div className="p-4 bg-dark-900/50 border-b border-dark-700">
+        <div className="p-4 bg-gray-50/50 border-b border-gray-200">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-dark-400 flex items-center gap-2">
+            <span className="text-gray-600 flex items-center gap-2">
               <PiggyBank className="w-4 h-4" />
               Goal: Save ₹{(originalBudget - goalAmount).toLocaleString()}
             </span>
-            <span className={`font-medium ${goalProgress >= 100 ? 'text-primary-400' : 'text-amber-400'}`}>
+            <span className={`font-medium ${goalProgress >= 100 ? 'text-primary-600' : 'text-amber-400'}`}>
               {Math.min(100, Math.max(0, goalProgress)).toFixed(0)}%
             </span>
           </div>
-          <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
               className={`h-full transition-all duration-500 ${
                 goalProgress >= 100 ? 'bg-primary-500' : 'bg-amber-500'
@@ -131,21 +131,21 @@ const SimulationSlider = ({ data, onSimulate }) => {
             <div key={category.name} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-white">{category.name}</span>
+                  <span className="text-sm text-gray-900">{category.name}</span>
                   {category.isFixed && (
-                    <span className="px-1.5 py-0.5 text-[10px] bg-dark-700 text-dark-400 rounded">
+                    <span className="px-1.5 py-0.5 text-[10px] bg-gray-100 text-gray-600 rounded">
                       Fixed
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-dark-400">
+                  <span className="text-xs text-gray-600">
                     ₹{category.amount.toLocaleString()}
                   </span>
                   <span className={`text-xs font-medium ${
                     adjustment > 0 ? 'text-red-400' : 
-                    adjustment < 0 ? 'text-primary-400' : 
-                    'text-dark-500'
+                    adjustment < 0 ? 'text-primary-600' : 
+                    'text-gray-500'
                   }`}>
                     → ₹{Math.round(adjustedAmount).toLocaleString()}
                   </span>
@@ -160,7 +160,7 @@ const SimulationSlider = ({ data, onSimulate }) => {
                   value={adjustment}
                   onChange={(e) => handleSliderChange(category.name, e.target.value)}
                   disabled={category.isFixed}
-                  className={`w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer
+                  className={`w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer
                     [&::-webkit-slider-thumb]:appearance-none
                     [&::-webkit-slider-thumb]:w-4
                     [&::-webkit-slider-thumb]:h-4
@@ -175,15 +175,15 @@ const SimulationSlider = ({ data, onSimulate }) => {
                 />
                 
                 {/* Center marker */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-4 bg-dark-600 pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-4 bg-gray-200 pointer-events-none" />
               </div>
               
               <div className="flex items-center justify-between text-xs">
-                <span className="text-primary-400">-50%</span>
+                <span className="text-primary-600">-50%</span>
                 <span className={`font-medium ${
                   adjustment > 0 ? 'text-red-400' : 
-                  adjustment < 0 ? 'text-primary-400' : 
-                  'text-dark-400'
+                  adjustment < 0 ? 'text-primary-600' : 
+                  'text-gray-600'
                 }`}>
                   {adjustment > 0 ? '+' : ''}{adjustment}%
                   {difference !== 0 && (
@@ -200,17 +200,17 @@ const SimulationSlider = ({ data, onSimulate }) => {
       </div>
 
       {/* Summary */}
-      <div className="p-4 bg-dark-900/50 border-t border-dark-700">
+      <div className="p-4 bg-gray-50/50 border-t border-gray-200">
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="text-center p-3 bg-dark-800 rounded-lg">
-            <p className="text-2xl font-bold text-white">₹{Math.round(projectedBudget).toLocaleString()}</p>
-            <p className="text-xs text-dark-500">Projected Spend</p>
+          <div className="text-center p-3 bg-white rounded-lg">
+            <p className="text-2xl font-bold text-gray-900">₹{Math.round(projectedBudget).toLocaleString()}</p>
+            <p className="text-xs text-gray-600">Projected Spend</p>
           </div>
-          <div className="text-center p-3 bg-dark-800 rounded-lg">
-            <p className={`text-2xl font-bold ${savings >= 0 ? 'text-primary-400' : 'text-red-400'}`}>
+          <div className="text-center p-3 bg-white rounded-lg">
+            <p className={`text-2xl font-bold ${savings >= 0 ? 'text-primary-600' : 'text-red-400'}`}>
               {savings >= 0 ? '+' : ''}₹{Math.round(savings).toLocaleString()}
             </p>
-            <p className="text-xs text-dark-500">
+            <p className="text-xs text-gray-600">
               {savings >= 0 ? 'Potential Savings' : 'Over Budget'}
             </p>
           </div>
@@ -220,7 +220,7 @@ const SimulationSlider = ({ data, onSimulate }) => {
         <button
           onClick={handleSimulate}
           disabled={isSimulating || savings === 0}
-          className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-dark-700 disabled:text-dark-500 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-100 disabled:text-gray-500 text-gray-900 font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           {isSimulating ? (
             <>
@@ -238,12 +238,12 @@ const SimulationSlider = ({ data, onSimulate }) => {
 
       {/* Simulation Result */}
       {simulationResult && (
-        <div className="p-4 border-t border-dark-700 bg-primary-500/5">
+        <div className="p-4 border-t border-gray-200 bg-primary-500/5">
           <div className="flex items-start gap-2">
-            <CheckCircle className="w-4 h-4 text-primary-400 mt-0.5 flex-shrink-0" />
+            <CheckCircle className="w-4 h-4 text-primary-600 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm text-white font-medium">{simulationResult.title}</p>
-              <p className="text-xs text-dark-400 mt-1">{simulationResult.description}</p>
+              <p className="text-sm text-gray-900 font-medium">{simulationResult.title}</p>
+              <p className="text-xs text-gray-600 mt-1">{simulationResult.description}</p>
             </div>
           </div>
         </div>
@@ -251,14 +251,14 @@ const SimulationSlider = ({ data, onSimulate }) => {
 
       {/* Tips */}
       {data.tips && data.tips.length > 0 && (
-        <div className="p-4 border-t border-dark-700">
-          <h4 className="text-xs font-medium text-dark-400 mb-2 flex items-center gap-1">
+        <div className="p-4 border-t border-gray-200">
+          <h4 className="text-xs font-medium text-gray-600 mb-2 flex items-center gap-1">
             <Lightbulb className="w-3 h-3 text-amber-400" />
             Tips
           </h4>
           <ul className="space-y-1">
             {data.tips.map((tip, idx) => (
-              <li key={idx} className="text-xs text-dark-300 flex items-start gap-2">
+              <li key={idx} className="text-xs text-gray-700 flex items-start gap-2">
                 <span className="text-amber-400">•</span>
                 {tip}
               </li>

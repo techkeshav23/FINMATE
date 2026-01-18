@@ -43,22 +43,22 @@ const DecisionGuide = ({ data, onAction }) => {
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-dark-700 bg-gradient-to-r from-primary-600/10 to-transparent">
+      <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-primary-600/10 to-transparent">
         <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-primary-400" />
-          <h3 className="text-sm font-medium text-white">{data.title || 'Recommended Actions'}</h3>
+          <Target className="w-4 h-4 text-primary-600" />
+          <h3 className="text-sm font-medium text-gray-900">{data.title || 'Recommended Actions'}</h3>
         </div>
         {data.context && (
-          <p className="text-xs text-dark-400 mt-1">{data.context}</p>
+          <p className="text-xs text-gray-600 mt-1">{data.context}</p>
         )}
       </div>
 
       {/* Decision Steps */}
       {data.steps && (
-        <div className="p-4 border-b border-dark-700">
-          <h4 className="text-xs font-medium text-dark-400 mb-3">Follow these steps:</h4>
+        <div className="p-4 border-b border-gray-200">
+          <h4 className="text-xs font-medium text-gray-600 mb-3">Follow these steps:</h4>
           <div className="space-y-3">
             {data.steps.map((step, idx) => {
               const isCompleted = completedSteps.includes(step.id);
@@ -69,13 +69,13 @@ const DecisionGuide = ({ data, onAction }) => {
                   key={step.id}
                   className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
                     isCompleted ? 'bg-primary-500/10' : 
-                    isActive ? 'bg-dark-700/50 ring-1 ring-primary-500/30' : 
-                    'bg-dark-900/30'
+                    isActive ? 'bg-gray-100/50 ring-1 ring-primary-500/30' : 
+                    'bg-gray-50/30'
                   }`}
                 >
                   <button
                     onClick={() => handleStepComplete(step.id)}
-                    className={`mt-0.5 ${isCompleted ? 'text-primary-400' : 'text-dark-500'}`}
+                    className={`mt-0.5 ${isCompleted ? 'text-primary-600' : 'text-gray-500'}`}
                     aria-label={isCompleted ? 'Step completed' : 'Mark step as complete'}
                   >
                     {isCompleted ? (
@@ -85,11 +85,11 @@ const DecisionGuide = ({ data, onAction }) => {
                     )}
                   </button>
                   <div className="flex-1">
-                    <p className={`text-sm ${isCompleted ? 'text-dark-400 line-through' : 'text-white'}`}>
+                    <p className={`text-sm ${isCompleted ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
                       {step.title}
                     </p>
                     {step.detail && !isCompleted && (
-                      <p className="text-xs text-dark-400 mt-1">{step.detail}</p>
+                      <p className="text-xs text-gray-600 mt-1">{step.detail}</p>
                     )}
                     {step.action && !isCompleted && isActive && (
                       <button
@@ -107,13 +107,13 @@ const DecisionGuide = ({ data, onAction }) => {
           
           {/* Progress */}
           <div className="mt-4 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-dark-700 rounded-full overflow-hidden">
+            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-primary-500 transition-all duration-500"
                 style={{ width: `${(completedSteps.length / data.steps.length) * 100}%` }}
               />
             </div>
-            <span className="text-xs text-dark-400">
+            <span className="text-xs text-gray-600">
               {completedSteps.length}/{data.steps.length}
             </span>
           </div>
@@ -123,7 +123,7 @@ const DecisionGuide = ({ data, onAction }) => {
       {/* Quick Actions */}
       {data.quickActions && (
         <div className="p-4">
-          <h4 className="text-xs font-medium text-dark-400 mb-3">Quick Actions</h4>
+          <h4 className="text-xs font-medium text-gray-600 mb-3">Quick Actions</h4>
           <div className="grid grid-cols-2 gap-2">
             {data.quickActions.map((action, idx) => (
               <button
@@ -132,15 +132,15 @@ const DecisionGuide = ({ data, onAction }) => {
                 className={`p-3 rounded-lg border transition-all text-left hover:border-primary-500/50 ${
                   selectedAction?.id === action.id 
                     ? 'border-primary-500 bg-primary-500/10' 
-                    : 'border-dark-700 hover:bg-dark-700/50'
+                    : 'border-gray-200 hover:bg-gray-100/50'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-primary-400">{getActionIcon(action.type)}</span>
-                  <span className="text-sm text-white">{action.label}</span>
+                  <span className="text-primary-600">{getActionIcon(action.type)}</span>
+                  <span className="text-sm text-gray-900">{action.label}</span>
                 </div>
                 {action.description && (
-                  <p className="text-xs text-dark-400">{action.description}</p>
+                  <p className="text-xs text-gray-600">{action.description}</p>
                 )}
               </button>
             ))}
@@ -150,10 +150,10 @@ const DecisionGuide = ({ data, onAction }) => {
 
       {/* Insight */}
       {data.insight && (
-        <div className="p-4 border-t border-dark-700 bg-dark-900/50">
+        <div className="p-4 border-t border-gray-200 bg-gray-50/50">
           <div className="flex items-start gap-2">
             <Lightbulb className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-dark-300">{data.insight}</p>
+            <p className="text-xs text-gray-700">{data.insight}</p>
           </div>
         </div>
       )}

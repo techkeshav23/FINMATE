@@ -139,7 +139,7 @@ const CSVUpload = ({ onClose, onUploadSuccess }) => {
                   </div>
                 ) : (
                   <>
-                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                    <Upload className="w-12 h-12 text-gray-600 mx-auto mb-3" />
                     <p className="text-gray-700 mb-1">
                       Drop your CSV file here
                     </p>

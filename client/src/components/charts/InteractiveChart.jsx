@@ -23,7 +23,7 @@ const COLORS = ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 // Custom tooltip component for consistent styling
 const CustomTooltip = ({ children }) => (
-  <div className="bg-dark-900 border border-dark-700 rounded-lg p-3 shadow-xl">
+  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 shadow-xl">
     {children}
   </div>
 );
@@ -47,13 +47,13 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl p-4 border border-dark-700">
+    <div className="bg-white rounded-xl p-4 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-dark-300 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-primary-400" />
+        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-primary-600" />
           {title || 'Spending Breakdown'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-dark-500">
+        <div className="flex items-center gap-1 text-xs text-gray-400">
           <ZoomIn className="w-3 h-3" />
           <span>Click to drill down</span>
         </div>
@@ -75,22 +75,22 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
           />
           <Tooltip 
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              color: '#f1f5f9'
+              color: '#1f2937'
             }}
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const item = payload[0].payload;
                 return (
                   <CustomTooltip>
-                    <p className="text-white font-medium">{item.name}</p>
-                    <p className="text-primary-400 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    <p className="text-gray-900 font-medium">{item.name}</p>
+                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
                     {item.percentage && (
-                      <p className="text-dark-400 text-xs">{item.percentage}% of total</p>
+                      <p className="text-gray-500 text-xs">{item.percentage}% of total</p>
                     )}
-                    <div className="mt-2 pt-2 border-t border-dark-700 flex items-center gap-1 text-xs text-primary-400">
+                    <div className="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1 text-xs text-primary-600">
                       <ZoomIn className="w-3 h-3" />
                       <span>Click to see details</span>
                     </div>
@@ -123,16 +123,16 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
       {/* Drill-down hint */}
       {selectedBar && (
         <div className="mt-3 p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">
-          <span className="text-sm text-primary-400">
+          <span className="text-sm text-primary-600">
             Showing details for <strong>{selectedBar}</strong>
           </span>
-          <ChevronRight className="w-4 h-4 text-primary-400" />
+          <ChevronRight className="w-4 h-4 text-primary-600" />
         </div>
       )}
 
-      <div className="mt-4 pt-4 border-t border-dark-700 flex items-center justify-between text-sm">
-        <span className="text-dark-400">Total Expenses</span>
-        <span className="text-white font-semibold">₹{data.total?.toLocaleString()}</span>
+      <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-sm">
+        <span className="text-gray-500">Total Expenses</span>
+        <span className="text-gray-900 font-semibold">₹{data.total?.toLocaleString()}</span>
       </div>
     </div>
   );
@@ -158,13 +158,13 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl p-4 border border-dark-700">
+    <div className="bg-white rounded-xl p-4 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-dark-300 flex items-center gap-2">
-          <IndianRupee className="w-4 h-4 text-primary-400" />
+        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <IndianRupee className="w-4 h-4 text-primary-600" />
           {title || 'Category Distribution'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-dark-500">
+        <div className="flex items-center gap-1 text-xs text-gray-400">
           <Layers className="w-3 h-3" />
           <span>Click to explore</span>
         </div>
@@ -198,20 +198,20 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
           </Pie>
           <Tooltip 
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              color: '#f1f5f9'
+              color: '#1f2937'
             }}
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const item = payload[0].payload;
                 return (
                   <CustomTooltip>
-                    <p className="text-white font-medium">{item.category}</p>
-                    <p className="text-primary-400 text-lg">₹{item.amount?.toLocaleString()}</p>
-                    <p className="text-dark-400 text-xs">{item.percentage}% of spending</p>
-                    <div className="mt-2 pt-2 border-t border-dark-700 flex items-center gap-1 text-xs text-amber-400">
+                    <p className="text-gray-900 font-medium">{item.category}</p>
+                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    <p className="text-gray-500 text-xs">{item.percentage}% of spending</p>
+                    <div className="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1 text-xs text-amber-400">
                       <ZoomIn className="w-3 h-3" />
                       <span>Click to see all {item.category} expenses</span>
                     </div>
@@ -232,8 +232,8 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
             onClick={() => handlePieClick(item)}
             className={`flex items-center gap-2 text-xs p-2 rounded-lg transition-colors ${
               selectedCategory === (item.category || item.name)
-                ? 'bg-dark-700 ring-1 ring-primary-500'
-                : 'hover:bg-dark-700/50'
+                ? 'bg-gray-100 ring-1 ring-primary-500'
+                : 'hover:bg-gray-100/50'
             }`}
             aria-label={`View ${item.category} details`}
           >
@@ -241,9 +241,9 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
               className="w-3 h-3 rounded-full flex-shrink-0" 
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
             />
-            <span className="text-dark-400 flex-1 text-left truncate">{item.category}</span>
-            <span className="text-dark-300">{item.percentage}%</span>
-            <ArrowRight className="w-3 h-3 text-dark-600" />
+            <span className="text-gray-500 flex-1 text-left truncate">{item.category}</span>
+            <span className="text-gray-700">{item.percentage}%</span>
+            <ArrowRight className="w-3 h-3 text-gray-300" />
           </button>
         ))}
       </div>
@@ -270,13 +270,13 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl p-4 border border-dark-700">
+    <div className="bg-white rounded-xl p-4 border border-gray-200">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-dark-300 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-primary-400" />
+        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <Calendar className="w-4 h-4 text-primary-600" />
           {title || 'Spending Trend'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-dark-500">
+        <div className="flex items-center gap-1 text-xs text-gray-400">
           <ZoomIn className="w-3 h-3" />
           <span>Click date for details</span>
         </div>
@@ -299,8 +299,8 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
           />
           <Tooltip 
             contentStyle={{
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
+              backgroundColor: '#ffffff',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px'
             }}
             content={({ active, payload }) => {
@@ -308,14 +308,14 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
                 const item = payload[0].payload;
                 return (
                   <CustomTooltip>
-                    <p className="text-white font-medium">
+                    <p className="text-gray-900 font-medium">
                       {new Date(item.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
-                    <p className="text-primary-400 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
                     {item.count && (
-                      <p className="text-dark-400 text-xs">{item.count} transactions</p>
+                      <p className="text-gray-500 text-xs">{item.count} transactions</p>
                     )}
-                    <div className="mt-2 pt-2 border-t border-dark-700 flex items-center gap-1 text-xs text-primary-400">
+                    <div className="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1 text-xs text-primary-600">
                       <ZoomIn className="w-3 h-3" />
                       <span>Click to see this day's expenses</span>
                     </div>
@@ -342,10 +342,10 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
 
       {selectedPoint && (
         <div className="mt-3 p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">
-          <span className="text-sm text-primary-400">
+          <span className="text-sm text-primary-600">
             Loading transactions for <strong>{new Date(selectedPoint.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}</strong>
           </span>
-          <ChevronRight className="w-4 h-4 text-primary-400 animate-pulse" />
+          <ChevronRight className="w-4 h-4 text-primary-600 animate-pulse" />
         </div>
       )}
     </div>

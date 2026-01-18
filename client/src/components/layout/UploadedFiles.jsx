@@ -101,7 +101,7 @@ const FileItem = ({ file, confirmDelete, onDelete, onCancelDelete, formatDate })
         </button>
         <button
           onClick={() => onDelete(file.id)}
-          className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 flex items-center gap-1"
+          className="px-2 py-1 bg-red-500 text-gray-900 text-xs rounded hover:bg-red-600 flex items-center gap-1"
         >
           <Trash2 className="w-3 h-3" />
           Delete
@@ -118,7 +118,7 @@ const FileItem = ({ file, confirmDelete, onDelete, onCancelDelete, formatDate })
         <p className="text-xs font-medium text-gray-800 truncate">
           {file.name}
         </p>
-        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-400">
+        <div className="flex items-center gap-2 mt-0.5 text-[10px] text-gray-600">
           <span className="flex items-center gap-0.5">
             <Calendar className="w-2.5 h-2.5" />
             {formatDate(file.uploadedAt)}
@@ -131,7 +131,7 @@ const FileItem = ({ file, confirmDelete, onDelete, onCancelDelete, formatDate })
       {/* Delete Button */}
       <button
         onClick={() => onDelete(file.id)}
-        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-all"
+        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 rounded text-gray-600 hover:text-red-500 transition-all"
         title="Delete this file"
       >
         <Trash2 className="w-3.5 h-3.5" />

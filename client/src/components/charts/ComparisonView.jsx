@@ -44,30 +44,30 @@ const ComparisonView = ({ data }) => {
 
   const getTrendIcon = (change) => {
     if (change > 0) return <TrendingUp className="w-4 h-4 text-red-400" />;
-    if (change < 0) return <TrendingDown className="w-4 h-4 text-primary-400" />;
-    return <Minus className="w-4 h-4 text-dark-500" />;
+    if (change < 0) return <TrendingDown className="w-4 h-4 text-primary-600" />;
+    return <Minus className="w-4 h-4 text-gray-500" />;
   };
 
   const getTrendColor = (change) => {
     if (change > 10) return 'text-red-400';
-    if (change < -10) return 'text-primary-400';
-    return 'text-dark-400';
+    if (change < -10) return 'text-primary-600';
+    return 'text-gray-600';
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-dark-700">
+      <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-dark-300 flex items-center gap-2">
-            <ArrowLeftRight className="w-4 h-4 text-primary-400" />
+          <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
+            <ArrowLeftRight className="w-4 h-4 text-primary-600" />
             {data.title || 'Comparison View'}
           </h3>
-          <div className="flex gap-1 bg-dark-900 rounded-lg p-1">
+          <div className="flex gap-1 bg-gray-50 rounded-lg p-1">
             <button
               onClick={() => setViewMode('bar')}
               className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                viewMode === 'bar' ? 'bg-primary-600 text-white' : 'text-dark-400 hover:text-white'
+                viewMode === 'bar' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900'
               }`}
               aria-pressed={viewMode === 'bar'}
             >
@@ -76,7 +76,7 @@ const ComparisonView = ({ data }) => {
             <button
               onClick={() => setViewMode('table')}
               className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                viewMode === 'table' ? 'bg-primary-600 text-white' : 'text-dark-400 hover:text-white'
+                viewMode === 'table' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900'
               }`}
               aria-pressed={viewMode === 'table'}
             >
@@ -89,22 +89,22 @@ const ComparisonView = ({ data }) => {
         <div className="flex items-center justify-center gap-4 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-blue-500" />
-            <span className="text-dark-400">{period1.label}</span>
-            <span className="text-white font-medium">₹{total1.toLocaleString()}</span>
+            <span className="text-gray-600">{period1.label}</span>
+            <span className="text-gray-900 font-medium">₹{total1.toLocaleString()}</span>
           </div>
-          <span className="text-dark-600">vs</span>
+          <span className="text-gray-600">vs</span>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded bg-primary-500" />
-            <span className="text-dark-400">{period2.label}</span>
-            <span className="text-white font-medium">₹{total2.toLocaleString()}</span>
+            <span className="text-gray-600">{period2.label}</span>
+            <span className="text-gray-900 font-medium">₹{total2.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
       {/* Summary Card */}
-      <div className="p-4 bg-dark-900/50 border-b border-dark-700">
+      <div className="p-4 bg-gray-50/50 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-dark-400">Overall Change</span>
+          <span className="text-sm text-gray-600">Overall Change</span>
           <div className="flex items-center gap-2">
             {getTrendIcon(totalChange)}
             <span className={`font-semibold ${getTrendColor(parseFloat(totalChangePercent))}`}>
@@ -133,10 +133,10 @@ const ComparisonView = ({ data }) => {
               />
               <Tooltip 
                 contentStyle={{
-                  backgroundColor: '#1e293b',
-                  border: '1px solid #334155',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
                   borderRadius: '8px',
-                  color: '#f1f5f9'
+                  color: '#1f2937'
                 }}
                 formatter={(value) => [`₹${value.toLocaleString()}`, '']}
               />
@@ -152,19 +152,19 @@ const ComparisonView = ({ data }) => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-dark-900/50">
-                <th className="px-4 py-3 text-left text-xs font-medium text-dark-400">Category</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-dark-400">{period1.label}</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-dark-400">{period2.label}</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-dark-400">Change</th>
+              <tr className="bg-gray-50/50">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Category</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">{period1.label}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">{period2.label}</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">Change</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-dark-700">
+            <tbody className="divide-y divide-gray-200">
               {comparison.map((item, idx) => (
-                <tr key={idx} className="hover:bg-dark-700/30">
-                  <td className="px-4 py-3 text-white">{item.category || item.name}</td>
-                  <td className="px-4 py-3 text-right text-dark-300">₹{item.amount1.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-dark-300">₹{item.amount2.toLocaleString()}</td>
+                <tr key={idx} className="hover:bg-gray-100/30">
+                  <td className="px-4 py-3 text-gray-900">{item.category || item.name}</td>
+                  <td className="px-4 py-3 text-right text-gray-700">₹{item.amount1.toLocaleString()}</td>
+                  <td className="px-4 py-3 text-right text-gray-700">₹{item.amount2.toLocaleString()}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       {getTrendIcon(item.change)}
@@ -176,11 +176,11 @@ const ComparisonView = ({ data }) => {
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-dark-900/50">
+            <tfoot className="bg-gray-50/50">
               <tr>
-                <td className="px-4 py-3 text-white font-medium">Total</td>
-                <td className="px-4 py-3 text-right text-white font-medium">₹{total1.toLocaleString()}</td>
-                <td className="px-4 py-3 text-right text-white font-medium">₹{total2.toLocaleString()}</td>
+                <td className="px-4 py-3 text-gray-900 font-medium">Total</td>
+                <td className="px-4 py-3 text-right text-gray-900 font-medium">₹{total1.toLocaleString()}</td>
+                <td className="px-4 py-3 text-right text-gray-900 font-medium">₹{total2.toLocaleString()}</td>
                 <td className="px-4 py-3 text-right">
                   <span className={`font-medium ${getTrendColor(parseFloat(totalChangePercent))}`}>
                     {totalChangePercent > 0 ? '+' : ''}{totalChangePercent}%
@@ -194,12 +194,12 @@ const ComparisonView = ({ data }) => {
 
       {/* Insights */}
       {data.insights && data.insights.length > 0 && (
-        <div className="p-4 border-t border-dark-700">
-          <h4 className="text-xs font-medium text-dark-400 mb-2">Key Insights</h4>
+        <div className="p-4 border-t border-gray-200">
+          <h4 className="text-xs font-medium text-gray-600 mb-2">Key Insights</h4>
           <ul className="space-y-1">
             {data.insights.map((insight, idx) => (
-              <li key={idx} className="text-xs text-dark-300 flex items-start gap-2">
-                <span className="text-primary-400">•</span>
+              <li key={idx} className="text-xs text-gray-700 flex items-start gap-2">
+                <span className="text-primary-600">•</span>
                 {insight}
               </li>
             ))}

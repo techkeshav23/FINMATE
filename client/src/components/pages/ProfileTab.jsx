@@ -123,7 +123,7 @@ const ProfileTab = ({
                     <p className="text-xs text-gray-500">{item.description}</p>
                   </div>
                   {item.action && (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-600" />
                   )}
                 </button>
               ))}
@@ -133,7 +133,7 @@ const ProfileTab = ({
 
         {/* Footer */}
         <div className="text-center py-4">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-600">
             FinMate • Built for ENCODE Hackathon 2026
           </p>
         </div>

@@ -28,13 +28,13 @@ const AnomalyCard = ({ data }) => {
       case 'high': return 'border-red-500/50 bg-red-500/10';
       case 'medium': return 'border-amber-500/50 bg-amber-500/10';
       case 'low': return 'border-blue-500/50 bg-blue-500/10';
-      default: return 'border-dark-600 bg-dark-800';
+      default: return 'border-gray-300 bg-white';
     }
   };
 
   const getSeverityIcon = (severity, type) => {
     if (type === 'spike') return <TrendingUp className="w-4 h-4 text-red-400" />;
-    if (type === 'drop') return <TrendingDown className="w-4 h-4 text-primary-400" />;
+    if (type === 'drop') return <TrendingDown className="w-4 h-4 text-primary-600" />;
     return <AlertTriangle className="w-4 h-4 text-amber-400" />;
   };
 
@@ -43,17 +43,17 @@ const AnomalyCard = ({ data }) => {
   };
 
   return (
-    <div className="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full p-4 flex items-center justify-between hover:bg-dark-700/30 transition-colors"
+        className="w-full p-4 flex items-center justify-between hover:bg-gray-100/30 transition-colors"
         aria-expanded={expanded}
         aria-label="Toggle anomalies"
       >
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-400" />
-          <h3 className="text-sm font-medium text-white">
+          <h3 className="text-sm font-medium text-gray-900">
             Anomalies Detected
           </h3>
           <span className="px-2 py-0.5 text-xs bg-amber-500/20 text-amber-400 rounded-full">
@@ -61,9 +61,9 @@ const AnomalyCard = ({ data }) => {
           </span>
         </div>
         {expanded ? (
-          <ChevronDown className="w-4 h-4 text-dark-400" />
+          <ChevronDown className="w-4 h-4 text-gray-600" />
         ) : (
-          <ChevronRight className="w-4 h-4 text-dark-400" />
+          <ChevronRight className="w-4 h-4 text-gray-600" />
         )}
       </button>
 
@@ -77,34 +77,34 @@ const AnomalyCard = ({ data }) => {
             >
               <button
                 onClick={() => handleDismiss(anomaly.id)}
-                className="absolute top-2 right-2 p-1 hover:bg-dark-700 rounded transition-colors"
+                className="absolute top-2 right-2 p-1 hover:bg-gray-100 rounded transition-colors"
                 aria-label="Dismiss anomaly"
               >
-                <X className="w-3 h-3 text-dark-500" />
+                <X className="w-3 h-3 text-gray-500" />
               </button>
               
               <div className="flex items-start gap-3">
                 {getSeverityIcon(anomaly.severity, anomaly.type)}
                 <div className="flex-1 pr-6">
-                  <p className="text-sm text-white font-medium">{anomaly.title}</p>
-                  <p className="text-xs text-dark-400 mt-1">{anomaly.description}</p>
+                  <p className="text-sm text-gray-900 font-medium">{anomaly.title}</p>
+                  <p className="text-xs text-gray-600 mt-1">{anomaly.description}</p>
                   
                   {/* Stats */}
                   {anomaly.stats && (
                     <div className="flex items-center gap-4 mt-2 flex-wrap">
                       <div className="text-xs">
-                        <span className="text-dark-500">Expected: </span>
-                        <span className="text-dark-300">₹{anomaly.stats.expected?.toLocaleString()}</span>
+                        <span className="text-gray-500">Expected: </span>
+                        <span className="text-gray-700">₹{anomaly.stats.expected?.toLocaleString()}</span>
                       </div>
                       <div className="text-xs">
-                        <span className="text-dark-500">Actual: </span>
-                        <span className={anomaly.stats.actual > anomaly.stats.expected ? 'text-red-400' : 'text-primary-400'}>
+                        <span className="text-gray-500">Actual: </span>
+                        <span className={anomaly.stats.actual > anomaly.stats.expected ? 'text-red-400' : 'text-primary-600'}>
                           ₹{anomaly.stats.actual?.toLocaleString()}
                         </span>
                       </div>
                       <div className="text-xs">
-                        <span className="text-dark-500">Diff: </span>
-                        <span className={anomaly.stats.diff > 0 ? 'text-red-400' : 'text-primary-400'}>
+                        <span className="text-gray-500">Diff: </span>
+                        <span className={anomaly.stats.diff > 0 ? 'text-red-400' : 'text-primary-600'}>
                           {anomaly.stats.diff > 0 ? '+' : ''}{anomaly.stats.diffPercent}%
                         </span>
                       </div>
@@ -113,9 +113,9 @@ const AnomalyCard = ({ data }) => {
                   
                   {/* Suggestion */}
                   {anomaly.suggestion && (
-                    <div className="flex items-start gap-2 mt-2 p-2 bg-dark-900/50 rounded">
-                      <Lightbulb className="w-3 h-3 text-primary-400 mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-dark-300">{anomaly.suggestion}</p>
+                    <div className="flex items-start gap-2 mt-2 p-2 bg-gray-50/50 rounded">
+                      <Lightbulb className="w-3 h-3 text-primary-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-700">{anomaly.suggestion}</p>
                     </div>
                   )}
                 </div>

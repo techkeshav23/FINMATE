@@ -239,7 +239,7 @@ const BankStatementParser = ({ onClose, onParseSuccess }) => {
                   </div>
                 ) : (
                   <>
-                    <Upload className="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                    <Upload className="w-10 h-10 text-gray-600 mx-auto mb-2" />
                     <p className="text-gray-700 text-sm">Drop your file here or click to browse</p>
                     <p className="text-xs text-gray-500 mt-1">
                       Supports: {sourceTypes.find(s => s.id === sourceType)?.accept}

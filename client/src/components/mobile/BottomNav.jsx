@@ -24,7 +24,7 @@ const BottomNav = ({ activeTab, onTabChange }) => {
               className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
                 isActive 
                   ? 'text-primary-500' 
-                  : 'text-gray-400 hover:text-gray-600'
+                  : 'text-gray-600 hover:text-gray-600'
               }`}
             >
               <tab.icon className={`w-5 h-5 ${isActive ? 'stroke-[2.5]' : ''}`} />

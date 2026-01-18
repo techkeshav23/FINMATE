@@ -199,7 +199,7 @@ const DataManager = ({ isOpen, onClose, onDataChanged }) => {
 
           {/* Actions */}
           <div className="space-y-3 pt-4 border-t border-gray-100">
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-xs text-gray-600 text-center">
               To add new data, use the upload buttons in the chat
             </p>
 
@@ -224,7 +224,7 @@ const DataManager = ({ isOpen, onClose, onDataChanged }) => {
                     <button
                       onClick={handleClearAll}
                       disabled={deleting}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 px-4 py-2 text-sm font-medium text-gray-900 bg-red-500 rounded-lg hover:bg-red-600 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {deleting ? (
                         <>

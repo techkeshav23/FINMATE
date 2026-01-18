@@ -75,11 +75,11 @@ const TimelineChart = ({ data, title, onDrillDown }) => {
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary-500" />
           {title || 'Spending Trend'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="flex items-center gap-1 text-xs text-gray-600">
           <ZoomIn className="w-3 h-3" />
           <span>Click to explore</span>
         </div>
@@ -95,23 +95,25 @@ const TimelineChart = ({ data, title, onDrillDown }) => {
             dataKey="date" 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: '#5f6368', fontSize: 12 }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
             tickFormatter={(value) => new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
           />
           <YAxis 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: '#5f6368', fontSize: 12 }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
             tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
           />
           <Tooltip 
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              color: '#202124',
+              color: '#1f2937',
               boxShadow: '0 2px 6px rgba(60,64,67,0.15)'
             }}
+            itemStyle={{ color: '#1f2937' }}
+            labelStyle={{ color: '#94a3b8' }}
             formatter={(value) => [`₹${value.toLocaleString()}`, 'Spent']}
             labelFormatter={(value) => new Date(value).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}
           />
@@ -146,11 +148,11 @@ const SpendingBarChart = ({ data, title, onDrillDown }) => {
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-primary-500" />
           {title || 'Spending Breakdown'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="flex items-center gap-1 text-xs text-gray-600">
           <ZoomIn className="w-3 h-3" />
           <span>Click to drill down</span>
         </div>
@@ -166,22 +168,24 @@ const SpendingBarChart = ({ data, title, onDrillDown }) => {
             dataKey="name" 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: '#5f6368', fontSize: 12 }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
           />
           <YAxis 
             axisLine={false}
             tickLine={false}
-            tick={{ fill: '#5f6368', fontSize: 12 }}
+            tick={{ fill: '#94a3b8', fontSize: 12 }}
             tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
           />
           <Tooltip 
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              color: '#202124',
+              color: '#1f2937',
               boxShadow: '0 2px 6px rgba(60,64,67,0.15)'
             }}
+            itemStyle={{ color: '#1f2937' }}
+            labelStyle={{ color: '#94a3b8' }}
             formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']}
           />
           <Bar 
@@ -199,7 +203,7 @@ const SpendingBarChart = ({ data, title, onDrillDown }) => {
         </BarChart>
       </ResponsiveContainer>
       <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-sm">
-        <span className="text-gray-500">Total Expenses</span>
+        <span className="text-gray-600">Total Expenses</span>
         <span className="text-gray-900 font-semibold">₹{data.total?.toLocaleString()}</span>
       </div>
     </div>
@@ -223,11 +227,11 @@ const CategoryPieChart = ({ data, title, onDrillDown }) => {
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <IndianRupee className="w-4 h-4 text-primary-500" />
           {title || 'Category Distribution'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="flex items-center gap-1 text-xs text-gray-600">
           <ZoomIn className="w-3 h-3" />
           <span>Click to explore</span>
         </div>
@@ -257,11 +261,13 @@ const CategoryPieChart = ({ data, title, onDrillDown }) => {
           <Tooltip 
             contentStyle={{
               backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
+              border: '1px solid #e5e7eb',
               borderRadius: '8px',
-              color: '#202124',
+              color: '#1f2937',
               boxShadow: '0 2px 6px rgba(60,64,67,0.15)'
             }}
+            itemStyle={{ color: '#1f2937' }}
+            labelStyle={{ color: '#94a3b8' }}
             formatter={(value) => [`₹${value.toLocaleString()}`, 'Amount']}
           />
         </PieChart>
@@ -273,8 +279,8 @@ const CategoryPieChart = ({ data, title, onDrillDown }) => {
               className="w-3 h-3 rounded-full" 
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
             />
-            <span className="text-gray-600">{item.category}</span>
-            <span className="text-gray-800 ml-auto font-medium">{item.percentage}%</span>
+            <span className="text-gray-700">{item.category}</span>
+            <span className="text-gray-900 ml-auto font-medium">{item.percentage}%</span>
           </div>
         ))}
       </div>
@@ -306,7 +312,7 @@ const TransactionTable = ({ data }) => {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
       <div className="p-4 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary-500" />
           {data.title || 'Transactions'}
         </h3>
@@ -314,18 +320,18 @@ const TransactionTable = ({ data }) => {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50">
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payer</th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <tr className="bg-gray-50/50">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Date</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Payer</th>
+              <th className="px-4 py-3 text-right text-xs font-medium text-gray-600 uppercase tracking-wider">Amount</th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-200">
             {transactions.map((txn, index) => (
-              <tr key={txn.id || index} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 text-gray-600 whitespace-nowrap">
+              <tr key={txn.id || index} className="hover:bg-gray-100/50 transition-colors">
+                <td className="px-4 py-3 text-gray-700 whitespace-nowrap">
                   {new Date(txn.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                 </td>
                 <td className="px-4 py-3 text-gray-900">{txn.description}</td>
@@ -366,7 +372,7 @@ const TransactionTable = ({ data }) => {
         </table>
       </div>
       <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-        <span className="text-sm text-gray-500">{transactions.length} transactions</span>
+        <span className="text-sm text-gray-600">{transactions.length} transactions</span>
         <span className="text-sm text-gray-900 font-medium">Total: ₹{transactions.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}</span>
       </div>
     </div>
@@ -379,7 +385,7 @@ const SettlementCard = ({ data }) => {
 
   return (
     <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-      <h3 className="text-sm font-medium text-gray-700 mb-4 flex items-center gap-2">
+      <h3 className="text-sm font-medium text-gray-900 mb-4 flex items-center gap-2">
         <Users className="w-4 h-4 text-primary-500" />
         Settlement Summary
       </h3>
@@ -389,24 +395,24 @@ const SettlementCard = ({ data }) => {
           {data.settlements.map((settlement, index) => (
             <div 
               key={index}
-              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+              className="flex items-center justify-between p-3 bg-gray-100/50 rounded-lg"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                  <span className="text-xs font-medium text-danger">
+                <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <span className="text-xs font-medium text-red-400">
                     {settlement.from.charAt(0)}
                   </span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                  <span className="text-xs font-medium text-success">
+                <ArrowRight className="w-4 h-4 text-gray-500" />
+                <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                  <span className="text-xs font-medium text-green-400">
                     {settlement.to.charAt(0)}
                   </span>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-gray-900 font-semibold">₹{settlement.amount.toLocaleString()}</div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-600">
                   {settlement.from} → {settlement.to}
                 </div>
               </div>
@@ -415,24 +421,24 @@ const SettlementCard = ({ data }) => {
         </div>
       ) : (
         <div className="text-center py-6">
-          <Check className="w-12 h-12 text-success mx-auto mb-2" />
-          <p className="text-gray-600">Everyone is settled up!</p>
+          <Check className="w-12 h-12 text-green-400 mx-auto mb-2" />
+          <p className="text-gray-700">Everyone is settled up!</p>
         </div>
       )}
 
       {/* Balance Overview */}
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <h4 className="text-xs font-medium text-gray-500 mb-3">Current Balances</h4>
+        <h4 className="text-xs font-medium text-gray-600 mb-3">Current Balances</h4>
         <div className="space-y-2">
           {data.balances.map((item, index) => (
             <div key={index} className="flex items-center justify-between">
               <span className="text-sm text-gray-700">{item.name}</span>
               <span className={`text-sm font-medium ${
                 item.balance > 0 
-                  ? 'text-success' 
+                  ? 'text-green-400' 
                   : item.balance < 0 
-                    ? 'text-danger' 
-                    : 'text-gray-400'
+                    ? 'text-red-400' 
+                    : 'text-gray-500'
               }`}>
                 {item.balance > 0 ? '+' : ''}₹{item.balance.toLocaleString()}
               </span>
@@ -447,46 +453,46 @@ const SettlementCard = ({ data }) => {
           onClick={() => setShowBreakdown(!showBreakdown)}
           className="flex items-center justify-between w-full text-left"
         >
-          <span className="text-xs font-medium text-gray-500 flex items-center gap-1">
+          <span className="text-xs font-medium text-gray-600 flex items-center gap-1">
             <HelpCircle className="w-3 h-3" />
             How was this calculated?
           </span>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
         </button>
         
         {showBreakdown && (
-          <div className="mt-3 p-3 bg-gray-50 rounded-lg text-xs space-y-3 animate-fade-in">
+          <div className="mt-3 p-3 bg-gray-100/50 rounded-lg text-xs space-y-3 animate-fade-in">
             <div>
-              <p className="text-gray-700 font-medium mb-1">📐 Calculation Method:</p>
-              <p className="text-gray-500">Using Splitwise-style debt simplification algorithm</p>
+              <p className="text-gray-800 font-medium mb-1">📐 Calculation Method:</p>
+              <p className="text-gray-600">Using Splitwise-style debt simplification algorithm</p>
             </div>
             
             <div>
-              <p className="text-gray-700 font-medium mb-1">📊 How Balances Work:</p>
-              <ul className="text-gray-500 space-y-1 ml-2">
-                <li>• <span className="text-success">Positive (+)</span> = Person is owed money (paid more than their share)</li>
-                <li>• <span className="text-danger">Negative (-)</span> = Person owes money (paid less than their share)</li>
+              <p className="text-gray-800 font-medium mb-1">📊 How Balances Work:</p>
+              <ul className="text-gray-600 space-y-1 ml-2">
+                <li>• <span className="text-green-400">Positive (+)</span> = Person is owed money (paid more than their share)</li>
+                <li>• <span className="text-red-400">Negative (-)</span> = Person owes money (paid less than their share)</li>
                 <li>• Zero = Person has paid exactly their fair share</li>
               </ul>
             </div>
             
             <div>
-              <p className="text-gray-700 font-medium mb-1">🔢 Step-by-Step:</p>
-              <ol className="text-gray-500 space-y-1 ml-2 list-decimal list-inside">
-                <li>Sum what each person <span className="text-success">paid</span> for others</li>
-                <li>Subtract what each person <span className="text-danger">owes</span> from splits</li>
+              <p className="text-gray-800 font-medium mb-1">🔢 Step-by-Step:</p>
+              <ol className="text-gray-600 space-y-1 ml-2 list-decimal list-inside">
+                <li>Sum what each person <span className="text-green-400">paid</span> for others</li>
+                <li>Subtract what each person <span className="text-red-400">owes</span> from splits</li>
                 <li>Net balance = Total Paid - Total Owed</li>
                 <li>Match people with negative balances to those with positive</li>
               </ol>
             </div>
 
-            <div className="pt-2 border-t border-gray-200">
-              <p className="text-gray-700 font-medium mb-1">💡 Example:</p>
-              <p className="text-gray-500">
+            <div className="pt-2 border-t border-gray-300">
+              <p className="text-gray-800 font-medium mb-1">💡 Example:</p>
+              <p className="text-gray-600">
                 If Rahul pays ₹3000 for rent split 3 ways:<br/>
-                • Rahul: +3000 (paid) - 1000 (his share) = <span className="text-success">+2000</span><br/>
-                • Priya: +0 - 1000 = <span className="text-danger">-1000</span> (owes Rahul)<br/>
-                • Amit: +0 - 1000 = <span className="text-danger">-1000</span> (owes Rahul)
+                • Rahul: +3000 (paid) - 1000 (his share) = <span className="text-green-400">+2000</span><br/>
+                • Priya: +0 - 1000 = <span className="text-red-400">-1000</span> (owes Rahul)<br/>
+                • Amit: +0 - 1000 = <span className="text-red-400">-1000</span> (owes Rahul)
               </p>
             </div>
           </div>
@@ -507,7 +513,7 @@ const DynamicComponentRenderer = ({ componentType, data, onAction, onDrillDown }
         <div className="thesys-genui-wrapper">
           {/* Source indicator for judges */}
           {data.source && (
-            <div className="mb-2 flex items-center gap-1.5 text-xs text-primary-400/70">
+            <div className="mb-2 flex items-center gap-1.5 text-xs text-primary-600/70">
               <Sparkles className="w-3 h-3" />
               <span>Dynamically generated UI</span>
             </div>
@@ -554,11 +560,11 @@ const DynamicComponentRenderer = ({ componentType, data, onAction, onDrillDown }
     default:
       console.warn(`Unknown component type: ${componentType}`);
       return (
-        <div className="bg-dark-800 rounded-xl p-4 border border-dark-700">
-          <p className="text-dark-400 text-sm">
+        <div className="bg-white rounded-xl p-4 border border-gray-200">
+          <p className="text-gray-500 text-sm">
             Component type "{componentType}" is not yet implemented.
           </p>
-          <pre className="mt-2 text-xs text-dark-500 overflow-auto">
+          <pre className="mt-2 text-xs text-gray-400 overflow-auto">
             {JSON.stringify(data, null, 2)}
           </pre>
         </div>
