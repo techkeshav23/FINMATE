@@ -49,6 +49,12 @@ export const savePatterns = (patterns) => {
 // Learn from transactions - build baseline patterns
 // participants = array of participant names (for group mode) or empty array (solo mode)
 export const learnFromTransactions = (transactions, participants = []) => {
+  // Guard against undefined transactions
+  if (!transactions || !Array.isArray(transactions)) {
+    console.log('⚠️ No transactions to learn from');
+    return loadPatterns();
+  }
+  
   const patterns = loadPatterns();
   
   // Reset learning
