@@ -42,9 +42,16 @@ export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
 
   // Normalize data (support both array and {data: [], total: 0} formats)
   const chartData = Array.isArray(data) ? data : (data?.data || []);
-  const total = Array.isArray(data) 
-    ? data.reduce((sum, item) => sum + (item.amount || 0), 0)
-    : (data?.total || 0);
+  
+  // Calculate total
+  let total = 0;
+  if (!Array.isArray(data) && data?.total) {
+    total = data.total;
+  } else {
+    // If series exists, sum the first series (usually primary metric like Income)
+    const key = series ? series[0] : 'amount';
+    total = chartData.reduce((sum, item) => sum + (item[key] || 0), 0);
+  }
 
   const handleBarClick = (entry, dataKey = 'amount') => {
     setSelectedBar(`${entry.name} - ${dataKey}`);
