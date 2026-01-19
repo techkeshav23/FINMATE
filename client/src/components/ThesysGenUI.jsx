@@ -384,15 +384,34 @@ const COMPONENT_REGISTRY = {
   },
   'BarChartV2': ({ chartData, onDrillDown, ...props }) => {
     // Adapter: Transform Thesys V2 data to Local Chart data
-    // Structure: labels: ["A", "B"], series: [{ values: [10, 20] }]
+    // Structure examples: 
+    // Single: labels: ["A", "B"], series: [{ values: [10, 20] }]
+    // Multi: labels: ["Jan", "Feb"], series: [{ category: "Income", values: [10, 20] }, { category: "Expense", values: [5, 6] }]
     const labels = chartData?.data?.labels || [];
-    const values = chartData?.data?.series?.[0]?.values || [];
+    const seriesList = chartData?.data?.series || [];
     
-    // Zip labels and values into [{ name: "A", amount: 10 }, ...]
-    const adaptedData = labels.map((label, idx) => ({
-      name: label,
-      amount: values[idx] || 0
-    }));
+    let adaptedData = [];
+    let seriesKeys = null;
+
+    if (seriesList.length > 1) {
+      // Handle Multiple Series
+      seriesKeys = seriesList.map(s => s.category || s.name || 'Value');
+      adaptedData = labels.map((label, idx) => {
+        const item = { name: label };
+        seriesList.forEach((s) => {
+           const key = s.category || s.name || 'Value';
+           item[key] = s.values[idx] || 0;
+        });
+        return item;
+      });
+    } else {
+      // Handle Single Series (Legacy/Simple)
+      const values = seriesList[0]?.values || [];
+      adaptedData = labels.map((label, idx) => ({
+        name: label,
+        amount: values[idx] || 0
+      }));
+    }
 
     return (
       <div className="w-full">
@@ -400,6 +419,7 @@ const COMPONENT_REGISTRY = {
             data={adaptedData} 
             title={chartData?.header?.props?.heading}
             onDrillDown={onDrillDown}
+            series={seriesKeys}
             {...props} 
         />
       </div>

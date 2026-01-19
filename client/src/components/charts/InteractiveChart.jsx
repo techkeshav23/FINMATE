@@ -34,8 +34,9 @@ const CustomTooltip = ({ children }) => (
  * @param {Object} data - Chart data with { data: [], total: number }
  * @param {string} title - Chart title
  * @param {Function} onDrillDown - Callback when bar is clicked
+ * @param {Array} series - Optional: Array of keys for multiple series
  */
-export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
+export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
 
@@ -45,10 +46,11 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
     ? data.reduce((sum, item) => sum + (item.amount || 0), 0)
     : (data?.total || 0);
 
-  const handleBarClick = (entry) => {
-    setSelectedBar(entry.name);
+  const handleBarClick = (entry, dataKey = 'amount') => {
+    setSelectedBar(`${entry.name} - ${dataKey}`);
     if (onDrillDown) {
-      onDrillDown(`Show me all ${entry.name} transactions`);
+      const drillDownKey = series ? `${dataKey} for ${entry.name}` : entry.name;
+      onDrillDown(`Show me ${drillDownKey} transactions`);
     }
   };
 
@@ -98,7 +100,11 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
                 return (
                   <CustomTooltip>
                     <p className="text-gray-900 font-medium">{item.name}</p>
-                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    {payload.map((p, idx) => (
+                      <p key={idx} className="text-sm font-semibold" style={{ color: p.color }}>
+                        {p.name}: ₹{p.value?.toLocaleString()}
+                      </p>
+                    ))}
                     {item.percentage && (
                       <p className="text-gray-500 text-xs">{item.percentage}% of total</p>
                     )}
@@ -112,23 +118,35 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
               return null;
             }}
           />
-          <Bar 
-            dataKey="amount" 
-            radius={[4, 4, 0, 0]}
-            cursor="pointer"
-            onMouseEnter={(data) => setHoveredBar(data.name)}
-            onMouseLeave={() => setHoveredBar(null)}
-            onClick={(data) => handleBarClick(data)}
-          >
-            {chartData.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`}
-                fill={selectedBar === entry.name ? '#3b82f6' : 
-                      hoveredBar === entry.name ? '#4ade80' : '#22c55e'}
-                className="transition-all duration-200"
+          {series ? (
+            series.map((s, idx) => (
+              <Bar
+                key={s}
+                dataKey={s}
+                radius={[4, 4, 0, 0]}
+                fill={COLORS[idx % COLORS.length]}
+                cursor="pointer"
               />
-            ))}
-          </Bar>
+            ))
+          ) : (
+            <Bar 
+              dataKey="amount" 
+              radius={[4, 4, 0, 0]}
+              cursor="pointer"
+              onMouseEnter={(data) => setHoveredBar(data.name)}
+              onMouseLeave={() => setHoveredBar(null)}
+              onClick={(data) => handleBarClick(data)}
+            >
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`}
+                  fill={selectedBar === entry.name ? '#3b82f6' : 
+                        hoveredBar === entry.name ? '#4ade80' : '#22c55e'}
+                  className="transition-all duration-200"
+                />
+              ))}
+            </Bar>
+          )}
         </BarChart>
       </ResponsiveContainer>
       </div>
