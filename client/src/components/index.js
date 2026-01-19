@@ -1,12 +1,12 @@
 /**
- * FinMate Components - Organized Structure
+ * FinMate Components - Small Vendor Persona
  * 
  * This file provides a central export point for all components.
  * Components are organized into:
  * 
  * - ui/         : Generic UI elements (badges, reasoning, clarifications)
  * - charts/     : Data visualization (bar, pie, timeline, comparison)
- * - features/   : Business logic components (anomalies, settlements, simulations)
+ * - features/   : Business logic components (anomalies, decisions, simulations)
  * - layout/     : Structural components (sidebar, modals)
  */
 
@@ -20,18 +20,14 @@ export { InteractiveBarChart, InteractivePieChart, InteractiveTimelineChart, Com
 export { 
   AnomalyCard, 
   ChangeDetection, 
-  SettlementConfirmation, 
-  SettlementSuccess, 
   DecisionGuide, 
   SimulationSlider 
 } from './features';
 
 // Layout Components
-export { Sidebar, CSVUpload, BankStatementParser } from './layout';
+export { Sidebar, CSVUpload } from './layout';
 
-// Legacy exports for backward compatibility (until migration is complete)
-// These point to the new organized structure
+// Direct component exports
 export { default as MessageBubble } from './MessageBubble';
 export { default as ChatWindow } from './ChatWindow';
-export { default as DynamicComponentRenderer } from './DynamicComponentRenderer';
 export { default as ThesysGenUI } from './ThesysGenUI';

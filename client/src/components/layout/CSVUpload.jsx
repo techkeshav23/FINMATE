@@ -69,17 +69,17 @@ const CSVUpload = ({ onClose, onUploadSuccess }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-md mx-4 shadow-lg">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white border border-gray-200 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
-            <Upload className="w-5 h-5 text-primary-500" />
-            <h3 className="font-semibold text-gray-900">Import Transactions</h3>
+            <Upload className="w-5 h-5 text-amber-500" />
+            <h3 className="font-semibold text-gray-900">Upload CSV</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Close"
           >
             <X className="w-5 h-5 text-gray-500" />
@@ -91,11 +91,16 @@ const CSVUpload = ({ onClose, onUploadSuccess }) => {
           {result ? (
             // Success state
             <div className="text-center py-6">
-              <CheckCircle className="w-16 h-16 text-success mx-auto mb-4" />
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
               <h4 className="text-lg font-semibold text-gray-900 mb-2">Upload Successful!</h4>
-              <p className="text-gray-500 mb-4">
-                Added {result.added} new transactions
+              <p className="text-gray-700 mb-2">
+                Added <span className="font-bold text-green-600">{result.added}</span> new transactions
               </p>
+              {result.duplicatesSkipped > 0 && (
+                <p className="text-amber-600 text-sm mb-4">
+                  ⚠️ {result.duplicatesSkipped} duplicate transactions were skipped
+                </p>
+              )}
               <button
                 onClick={onClose}
                 className="px-6 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
@@ -159,13 +164,13 @@ const CSVUpload = ({ onClose, onUploadSuccess }) => {
               )}
 
               {/* Format hint */}
-              <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-xs text-gray-600 mb-2">Expected CSV format:</p>
-                <code className="text-xs text-primary-600 block overflow-x-auto font-mono">
-                  date,description,amount,payer,category
+              <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                <p className="text-xs text-amber-700 mb-2 font-medium">CSV Format:</p>
+                <code className="text-xs text-amber-800 block overflow-x-auto font-mono bg-amber-100 p-2 rounded">
+                  date,type,amount,category,description
                 </code>
-                <p className="text-xs text-gray-500 mt-2">
-                  Example: 2026-01-15,Groceries,1500,Rahul,Food
+                <p className="text-xs text-amber-600 mt-2">
+                  Example: 2026-01-18,CREDIT,500,Sales,Morning sale
                 </p>
               </div>
 
@@ -173,14 +178,14 @@ const CSVUpload = ({ onClose, onUploadSuccess }) => {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={onClose}
-                  className="flex-1 px-4 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-xl transition-colors touch-manipulation min-h-[48px]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleUpload}
                   disabled={!file || uploading}
-                  className="flex-1 px-4 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl transition-colors flex items-center justify-center gap-2 touch-manipulation min-h-[48px]"
                 >
                   {uploading ? (
                     <>

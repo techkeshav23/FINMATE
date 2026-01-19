@@ -55,18 +55,18 @@ const ComparisonView = ({ data }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-gray-900 flex items-center gap-2">
-            <ArrowLeftRight className="w-4 h-4 text-primary-600" />
+      <div className="p-2.5 sm:p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h3 className="text-xs sm:text-sm font-medium text-gray-900 flex items-center gap-1.5 sm:gap-2">
+            <ArrowLeftRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
             {data.title || 'Comparison View'}
           </h3>
-          <div className="flex gap-1 bg-gray-50 rounded-lg p-1">
+          <div className="flex gap-0.5 sm:gap-1 bg-gray-50 rounded-lg p-0.5 sm:p-1">
             <button
               onClick={() => setViewMode('bar')}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-md transition-colors ${
                 viewMode === 'bar' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900'
               }`}
               aria-pressed={viewMode === 'bar'}
@@ -75,7 +75,7 @@ const ComparisonView = ({ data }) => {
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              className={`px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs rounded-md transition-colors ${
                 viewMode === 'table' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:text-gray-900'
               }`}
               aria-pressed={viewMode === 'table'}
@@ -86,15 +86,15 @@ const ComparisonView = ({ data }) => {
         </div>
         
         {/* Period Labels */}
-        <div className="flex items-center justify-center gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-blue-500" />
+        <div className="flex items-center justify-center gap-2 sm:gap-4 text-[10px] sm:text-xs flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-blue-500" />
             <span className="text-gray-600">{period1.label}</span>
             <span className="text-gray-900 font-medium">₹{total1.toLocaleString()}</span>
           </div>
           <span className="text-gray-600">vs</span>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-primary-500" />
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-primary-500" />
             <span className="text-gray-600">{period2.label}</span>
             <span className="text-gray-900 font-medium">₹{total2.toLocaleString()}</span>
           </div>
@@ -102,12 +102,12 @@ const ComparisonView = ({ data }) => {
       </div>
 
       {/* Summary Card */}
-      <div className="p-4 bg-gray-50/50 border-b border-gray-200">
+      <div className="p-2.5 sm:p-4 bg-gray-50/50 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">Overall Change</span>
-          <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm text-gray-600">Overall Change</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {getTrendIcon(totalChange)}
-            <span className={`font-semibold ${getTrendColor(parseFloat(totalChangePercent))}`}>
+            <span className={`text-xs sm:text-base font-semibold ${getTrendColor(parseFloat(totalChangePercent))}`}>
               {totalChange > 0 ? '+' : ''}₹{totalChange.toLocaleString()} ({totalChangePercent}%)
             </span>
           </div>
@@ -116,14 +116,18 @@ const ComparisonView = ({ data }) => {
 
       {/* Chart View */}
       {viewMode === 'bar' && (
-        <div className="p-4">
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+        <div className="p-2.5 sm:p-4">
+          <ResponsiveContainer width="100%" height={180} className="sm:!h-[250px]">
+            <BarChart data={chartData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
               <XAxis 
                 dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
-                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                tick={{ fill: '#94a3b8', fontSize: 10 }}
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+                height={40}
               />
               <YAxis 
                 axisLine={false} 
@@ -150,23 +154,23 @@ const ComparisonView = ({ data }) => {
       {/* Table View */}
       {viewMode === 'table' && (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[10px] sm:text-sm">
             <thead>
               <tr className="bg-gray-50/50">
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-600">Category</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">{period1.label}</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">{period2.label}</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-600">Change</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-600">Category</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-600">{period1.label}</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-600">{period2.label}</th>
+                <th className="px-2 sm:px-4 py-2 sm:py-3 text-right text-[10px] sm:text-xs font-medium text-gray-600">Change</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {comparison.map((item, idx) => (
                 <tr key={idx} className="hover:bg-gray-100/30">
-                  <td className="px-4 py-3 text-gray-900">{item.category || item.name}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">₹{item.amount1.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right text-gray-700">₹{item.amount2.toLocaleString()}</td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-1">
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-900">{item.category || item.name}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-700">₹{item.amount1.toLocaleString()}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-700">₹{item.amount2.toLocaleString()}</td>
+                  <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
+                    <div className="flex items-center justify-end gap-0.5 sm:gap-1">
                       {getTrendIcon(item.change)}
                       <span className={getTrendColor(item.changePercent)}>
                         {item.change > 0 ? '+' : ''}{item.changePercent}%
@@ -178,10 +182,10 @@ const ComparisonView = ({ data }) => {
             </tbody>
             <tfoot className="bg-gray-50/50">
               <tr>
-                <td className="px-4 py-3 text-gray-900 font-medium">Total</td>
-                <td className="px-4 py-3 text-right text-gray-900 font-medium">₹{total1.toLocaleString()}</td>
-                <td className="px-4 py-3 text-right text-gray-900 font-medium">₹{total2.toLocaleString()}</td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-900 font-medium">Total</td>
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-900 font-medium">₹{total1.toLocaleString()}</td>
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-900 font-medium">₹{total2.toLocaleString()}</td>
+                <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
                   <span className={`font-medium ${getTrendColor(parseFloat(totalChangePercent))}`}>
                     {totalChangePercent > 0 ? '+' : ''}{totalChangePercent}%
                   </span>

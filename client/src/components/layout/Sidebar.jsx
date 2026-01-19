@@ -1,218 +1,180 @@
 import { useState } from 'react';
 import { 
   MessageSquare, 
-  Settings, 
   Plus, 
   Trash2, 
   Menu,
-  X,
-  History,
-  HelpCircle,
-  LogOut,
-  User,
-  ChevronRight,
-  Sparkles,
-  Database,
-  Home,
-  Upload
+  Coffee,
+  TrendingUp,
+  Store,
+  Clock
 } from 'lucide-react';
 import DataManager from './DataManager';
 import UploadedFiles from './UploadedFiles';
 
 /**
- * Sidebar - Navigation and chat history
+ * Sidebar - Chat Sessions for Small Business
  * 
  * PS.md Alignment:
- * - Chat history for context
- * - Clean, professional layout
- * - User profile for personalization
- * - Data management for fresh starts
- * - Uploaded files list with delete option
- * - Tab navigation for desktop
+ * - Chat-first interface (no tabs)
+ * - Business-friendly branding
+ * - Chat sessions for context
+ * - Uploaded files management
+ * - Amber/Orange color scheme
  */
 const Sidebar = ({ 
-  chatHistory, 
+  sessions = [],
+  currentSessionId,
+  onSelectSession,
   onNewChat, 
   onClearHistory,
-  onDeleteChat,
+  onDeleteSession,
   isOpen,
   onToggle,
-  userName = 'User',
+  userName = 'Business Owner',
   onDataChanged,
   uploadedFiles = [],
-  onDeleteFile,
-  activeTab = 'chat',
-  onTabChange
+  onDeleteFile
 }) => {
-  const [showSettings, setShowSettings] = useState(false);
   const [showDataManager, setShowDataManager] = useState(false);
 
-  // Extract first letter for avatar
-  const userInitial = userName.charAt(0).toUpperCase();
-
-  // Navigation tabs
-  const navTabs = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'chat', label: 'Chat', icon: MessageSquare },
-    { id: 'upload', label: 'Upload', icon: Upload },
-    { id: 'profile', label: 'Profile', icon: User },
-  ];
+  // Format relative time
+  const formatTime = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   return (
     <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
-          onClick={onToggle}
-          aria-hidden="true"
-        />
-      )}
-
       {/* Sidebar */}
-      <div className={`
-        fixed lg:relative inset-y-0 left-0 z-50
-        w-[260px] bg-[#f0f2f5] text-gray-800
-        transform transition-transform duration-200 ease-out
-        ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        flex flex-col h-full border-r border-gray-200
-      `}>
+      <div className="w-full bg-amber-50 text-amber-900 flex flex-col h-full border-r border-amber-200">
         
-        {/* Header */}
-        <div className="p-4 flex flex-col items-center justify-center border-b border-gray-200/50">
-          <img src="/logo.png" alt="FinMate Logo" className="w-16 h-16 object-contain mb-2" />
-          <h1 className="font-bold text-xl text-gray-800 tracking-tight">FinMate</h1>
-          <p className="text-xs text-gray-500 font-medium flex items-center gap-1">
-            <Sparkles className="w-3 h-3" />
-            AI Financial Assistant
+        {/* Vendor Header */}
+        <div className="p-4 flex flex-col items-center justify-center border-b border-amber-200 bg-gradient-to-b from-amber-100 to-amber-50">
+          <div className="w-24 h-24 flex items-center justify-center mb-2">
+            <img
+              src="/logo.png"
+              alt="FinMate logo"
+              className="w-24 h-24 object-contain"
+            />
+          </div>
+          <h1 className="text-xl font-bold text-amber-900">FinMate</h1>
+          <p className="text-xs text-amber-600 font-medium flex items-center gap-1">
+            <Store className="w-3 h-3" />
+            Business Finance Tracker
           </p>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="p-2 border-b border-gray-200">
-          {navTabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => onTabChange?.(tab.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm ${
-                  isActive 
-                    ? 'bg-primary-50 text-primary-600 font-medium' 
-                    : 'text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <tab.icon className={`w-4 h-4 ${isActive ? 'text-primary-500' : 'text-gray-500'}`} />
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* New Chat Button */}
+        <div className="p-3">
+          <button
+            onClick={onNewChat}
+            className="w-full flex items-center gap-3 px-3 py-2.5 border border-amber-300 bg-white hover:bg-amber-100 rounded-md transition-colors text-sm text-amber-800 text-left shadow-sm"
+            aria-label="Start new conversation"
+          >
+            <Plus className="w-4 h-4 text-amber-600" />
+            New Chat
+          </button>
         </div>
 
-        {/* New Chat Button - Only show when on chat tab */}
-        {activeTab === 'chat' && (
-          <div className="p-3">
-            <button
-              onClick={onNewChat}
-              className="w-full flex items-center gap-3 px-3 py-2.5 border border-gray-200 bg-white hover:bg-gray-50 rounded-md transition-colors text-sm text-gray-700 text-left shadow-sm"
-              aria-label="Start new chat"
-            >
-              <Plus className="w-4 h-4 text-gray-500" />
-              New chat
-            </button>
-          </div>
-        )}
-
-        {/* Chat History - Only show when on chat tab */}
+        {/* Chat Sessions */}
         <div className="flex-1 overflow-y-auto px-3 custom-scrollbar">
-          {activeTab === 'chat' && (
-            <>
-              <div className="text-xs font-medium text-gray-600 px-3 mb-2 uppercase tracking-wider">
-                Today
-              </div>
-              
-              {chatHistory.length > 0 ? (
-                <div className="space-y-1">
-                  {chatHistory.slice(0, 50).map((chat, index) => {
-                    // Ensure content is a string
-                    const contentText = typeof chat.content === 'string' 
-                      ? chat.content 
-                      : (chat.content?.message || chat.content?.text || JSON.stringify(chat.content) || 'New conversation');
-                    return (
-                      <div
-                        key={index}
-                        className="w-full flex items-center gap-3 px-3 py-3 text-left text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors group cursor-pointer"
-                        role="button"
-                        tabIndex={0}
+          <div className="text-xs font-medium text-amber-700 px-3 mb-2 uppercase tracking-wider">
+            Chat Sessions
+          </div>
+          
+          {sessions.length > 0 ? (
+            <div className="space-y-1">
+              {sessions.slice(0, 50).map((session) => {
+                const isActive = session.id === currentSessionId;
+                return (
+                  <div
+                    key={session.id}
+                    onClick={() => onSelectSession && onSelectSession(session.id)}
+                    className={`w-full flex items-center gap-3 px-3 py-3 text-left text-sm rounded-md transition-colors group cursor-pointer ${
+                      isActive 
+                        ? 'bg-amber-200 text-amber-900' 
+                        : 'text-amber-800 hover:bg-amber-100'
+                    }`}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <MessageSquare className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-amber-700' : 'text-amber-600'}`} />
+                    <div className="flex-1 min-w-0">
+                      <span className="truncate block font-medium">
+                        {session.title || 'New Chat'}
+                      </span>
+                      <span className="text-xs text-amber-600 flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {formatTime(session.updatedAt || session.createdAt)}
+                      </span>
+                    </div>
+                    
+                    {onDeleteSession && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteSession(session.id);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-amber-300 rounded text-amber-600 transition-all"
+                        title="Delete"
+                        aria-label="Delete this chat"
                       >
-                        <MessageSquare className="w-4 h-4 text-gray-600 flex-shrink-0" />
-                        <span className="truncate flex-1">
-                          {contentText.substring(0, 24) || 'New conversation'}...
-                        </span>
-                        
-                        {/* Delete Button (Visible on Hover) */}
-                        {onDeleteChat && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDeleteChat(chat.id);
-                            }}
-                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-300 rounded text-gray-500 transition-all"
-                            title="Delete chat"
-                            aria-label="Delete this chat"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="px-3 py-4 text-sm text-gray-500 flex flex-col items-center text-center">
-                  <MessageSquare className="w-8 h-8 text-gray-700 mb-2" />
-                  <span className="italic">No chat history yet.</span>
-                  <span className="text-xs mt-1">Start a conversation!</span>
-                </div>
-              )}
-
-              {/* Uploaded Files Section */}
-              <UploadedFiles 
-                files={uploadedFiles} 
-                onDeleteFile={onDeleteFile}
-              />
-            </>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="px-3 py-4 text-sm text-amber-600 flex flex-col items-center text-center">
+              <Coffee className="w-8 h-8 text-amber-500 mb-2" />
+              <span className="italic">No chats yet</span>
+              <span className="text-xs mt-1">Ask your first question!</span>
+            </div>
           )}
+
+          {/* Uploaded Files Section */}
+          <UploadedFiles 
+            files={uploadedFiles} 
+            onDeleteFile={onDeleteFile}
+          />
         </div>
 
         {/* Bottom Actions */}
-        <div className="border-t border-gray-200 p-2 space-y-1 bg-white">
-          {/* Clear conversations - Only show when on chat tab */}
-          {activeTab === 'chat' && (
-            <button
-              onClick={onClearHistory}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-              aria-label="Clear all conversations"
-            >
-              <Trash2 className="w-4 h-4 text-gray-500" />
-              Clear conversations
-            </button>
-          )}
+        <div className="border-t border-amber-200 p-2 space-y-1 bg-amber-50">
+          {/* Clear conversations */}
+          <button
+            onClick={onClearHistory}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-amber-700 hover:bg-amber-100 rounded-md transition-colors"
+            aria-label="Clear all conversations"
+          >
+            <Trash2 className="w-4 h-4 text-amber-600" />
+            Clear all chats
+          </button>
 
-          {/* User Profile */}
-          <div className="pt-2 border-t border-gray-100 mt-2">
-            <button 
-              onClick={() => onTabChange?.('profile')}
-              className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors text-left"
-            >
-              <div className="w-6 h-6 rounded-sm bg-purple-600 flex items-center justify-center text-xs font-bold text-gray-900">
-                {userInitial}
+          {/* Business Profile */}
+          <div className="pt-2 border-t border-amber-200 mt-2">
+            <div className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-amber-800 rounded-md">
+              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-sm">
+                <TrendingUp className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium truncate">{userName}</div>
+                <div className="text-xs text-amber-600">Business Account</div>
               </div>
-              <Settings className="w-4 h-4 text-gray-600" />
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -226,15 +188,6 @@ const Sidebar = ({
           if (onDataChanged) onDataChanged();
         }}
       />
-
-      {/* Mobile Toggle Button */}
-      <button
-        onClick={onToggle}
-        className="fixed top-3 left-3 z-30 lg:hidden p-2.5 bg-white text-gray-600 rounded-md shadow-md transition-colors border border-gray-200"
-        aria-label="Toggle sidebar"
-      >
-        <Menu className="w-5 h-5" />
-      </button>
     </>
   );
 };

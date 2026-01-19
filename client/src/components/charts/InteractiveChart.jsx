@@ -39,6 +39,12 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
 
+  // Normalize data (support both array and {data: [], total: 0} formats)
+  const chartData = Array.isArray(data) ? data : (data?.data || []);
+  const total = Array.isArray(data) 
+    ? data.reduce((sum, item) => sum + (item.amount || 0), 0)
+    : (data?.total || 0);
+
   const handleBarClick = (entry) => {
     setSelectedBar(entry.name);
     if (onDrillDown) {
@@ -47,33 +53,39 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-primary-600" />
+    <div className="bg-white rounded-lg sm:rounded-xl p-2.5 sm:p-4 border border-gray-200 w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-2 sm:mb-4">
+        <h3 className="text-[11px] sm:text-sm font-medium text-gray-700 flex items-center gap-1.5 sm:gap-2">
+          <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
           {title || 'Spending Breakdown'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
           <ZoomIn className="w-3 h-3" />
           <span>Click to drill down</span>
         </div>
       </div>
       
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data.data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-          <XAxis 
-            dataKey="name" 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
-          />
-          <YAxis 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
-            tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
-          />
-          <Tooltip 
+      <div className="w-full overflow-x-auto -mx-1 px-1">
+        <ResponsiveContainer width="100%" height={140} minWidth={200}>
+          <BarChart data={chartData} margin={{ top: 10, right: 5, left: -15, bottom: 0 }}>
+            <XAxis 
+              dataKey="name" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              interval={0}
+              angle={-20}
+              textAnchor="end"
+              height={40}
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
+              width={45}
+            />
+            <Tooltip 
             contentStyle={{
               backgroundColor: '#ffffff',
               border: '1px solid #e5e7eb',
@@ -108,7 +120,7 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
             onMouseLeave={() => setHoveredBar(null)}
             onClick={(data) => handleBarClick(data)}
           >
-            {data.data.map((entry, index) => (
+            {chartData.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`}
                 fill={selectedBar === entry.name ? '#3b82f6' : 
@@ -119,20 +131,21 @@ export const InteractiveBarChart = ({ data, title, onDrillDown }) => {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      </div>
 
       {/* Drill-down hint */}
       {selectedBar && (
-        <div className="mt-3 p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">
-          <span className="text-sm text-primary-600">
-            Showing details for <strong>{selectedBar}</strong>
+        <div className="mt-2 sm:mt-3 p-1.5 sm:p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">
+          <span className="text-[10px] sm:text-sm text-primary-600">
+            Showing <strong>{selectedBar}</strong>
           </span>
-          <ChevronRight className="w-4 h-4 text-primary-600" />
+          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary-600" />
         </div>
       )}
 
-      <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between text-sm">
-        <span className="text-gray-500">Total Expenses</span>
-        <span className="text-gray-900 font-semibold">₹{data.total?.toLocaleString()}</span>
+      <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-gray-200 flex items-center justify-between">
+        <span className="text-gray-500 text-[10px] sm:text-sm">Total</span>
+        <span className="text-gray-900 font-semibold text-xs sm:text-base">₹{total?.toLocaleString()}</span>
       </div>
     </div>
   );
@@ -149,6 +162,9 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  // Normalize data
+  const chartData = Array.isArray(data) ? data : (data?.data || []);
+
   const handlePieClick = (entry) => {
     const category = entry.category || entry.name;
     setSelectedCategory(category);
@@ -158,40 +174,41 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+    <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200 w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h3 className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
           <IndianRupee className="w-4 h-4 text-primary-600" />
           {title || 'Category Distribution'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
           <Layers className="w-3 h-3" />
           <span>Click to explore</span>
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={200}>
-        <PieChart>
-          <Pie
-            data={data.data}
-            cx="50%"
-            cy="50%"
-            innerRadius={50}
-            outerRadius={activeIndex !== null ? 85 : 80}
-            paddingAngle={2}
-            dataKey="amount"
-            nameKey="category"
-            onMouseEnter={(_, index) => setActiveIndex(index)}
-            onMouseLeave={() => setActiveIndex(null)}
-            onClick={(entry) => handlePieClick(entry)}
-            cursor="pointer"
-          >
-            {data.data.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
-                fill={COLORS[index % COLORS.length]}
-                stroke={activeIndex === index ? '#fff' : 'transparent'}
-                strokeWidth={activeIndex === index ? 2 : 0}
+      <div className="w-full overflow-hidden">
+        <ResponsiveContainer width="100%" height={140} className="sm:!h-[180px]">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={32}
+              outerRadius={activeIndex !== null ? 55 : 50}
+              paddingAngle={2}
+              dataKey="amount"
+              nameKey="category"
+              onMouseEnter={(_, index) => setActiveIndex(index)}
+              onMouseLeave={() => setActiveIndex(null)}
+              onClick={(entry) => handlePieClick(entry)}
+              cursor="pointer"
+            >
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={COLORS[index % COLORS.length]}
+                  stroke={activeIndex === index ? '#fff' : 'transparent'}
+                  strokeWidth={activeIndex === index ? 2 : 0}
                 className="transition-all duration-200"
               />
             ))}
@@ -223,27 +240,27 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
           />
         </PieChart>
       </ResponsiveContainer>
+      </div>
 
       {/* Category Legend with click */}
-      <div className="grid grid-cols-2 gap-2 mt-4">
-        {data.data.map((item, index) => (
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 mt-3 sm:mt-4">
+        {chartData.slice(0, 6).map((item, index) => (
           <button
             key={index}
             onClick={() => handlePieClick(item)}
-            className={`flex items-center gap-2 text-xs p-2 rounded-lg transition-colors ${
+            className={`flex items-center gap-1.5 sm:gap-2 text-xs p-1.5 sm:p-2 rounded-lg transition-colors touch-manipulation ${
               selectedCategory === (item.category || item.name)
                 ? 'bg-gray-100 ring-1 ring-primary-500'
-                : 'hover:bg-gray-100/50'
+                : 'hover:bg-gray-100/50 active:bg-gray-100'
             }`}
             aria-label={`View ${item.category} details`}
           >
             <div 
-              className="w-3 h-3 rounded-full flex-shrink-0" 
+              className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0" 
               style={{ backgroundColor: COLORS[index % COLORS.length] }}
             />
-            <span className="text-gray-500 flex-1 text-left truncate">{item.category}</span>
-            <span className="text-gray-700">{item.percentage}%</span>
-            <ArrowRight className="w-3 h-3 text-gray-300" />
+            <span className="text-gray-500 flex-1 text-left truncate text-[10px] sm:text-xs">{item.category}</span>
+            <span className="text-gray-700 text-[10px] sm:text-xs">{item.percentage}%</span>
           </button>
         ))}
       </div>
@@ -261,6 +278,9 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
 export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
   const [selectedPoint, setSelectedPoint] = useState(null);
 
+  // Normalize data
+  const chartData = Array.isArray(data) ? data : (data?.data || []);
+
   const handlePointClick = (point) => {
     setSelectedPoint(point);
     if (onDrillDown && point.date) {
@@ -270,34 +290,37 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-700 flex items-center gap-2">
+    <div className="bg-white rounded-xl p-3 sm:p-4 border border-gray-200 w-full overflow-hidden">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h3 className="text-xs sm:text-sm font-medium text-gray-700 flex items-center gap-2">
           <Calendar className="w-4 h-4 text-primary-600" />
           {title || 'Spending Trend'}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-gray-400">
+        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
           <ZoomIn className="w-3 h-3" />
           <span>Click date for details</span>
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={data.data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-          <XAxis 
-            dataKey="date" 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
-            tickFormatter={(value) => new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-          />
-          <YAxis 
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: '#94a3b8', fontSize: 12 }}
-            tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
-          />
-          <Tooltip 
+      <div className="w-full overflow-x-auto -mx-2 px-2">
+        <ResponsiveContainer width="100%" height={140} minWidth={260} className="sm:!h-[180px]">
+          <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <XAxis 
+              dataKey="date" 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              tickFormatter={(value) => new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              interval="preserveStartEnd"
+            />
+            <YAxis 
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#94a3b8', fontSize: 10 }}
+              tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
+              width={45}
+            />
+            <Tooltip 
             contentStyle={{
               backgroundColor: '#ffffff',
               border: '1px solid #e5e7eb',
@@ -339,6 +362,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
 
       {selectedPoint && (
         <div className="mt-3 p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">

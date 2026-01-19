@@ -10,20 +10,20 @@ export default {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       },
       colors: {
-        // Google Blue - Primary brand color
+        // Vendor Theme - Warm Amber/Orange
         primary: {
-          50: '#e8f0fe',
-          100: '#d2e3fc',
-          200: '#aecbfa',
-          300: '#8ab4f8',
-          400: '#669df6',
-          500: '#1a73e8', // Google Blue
-          600: '#1967d2',
-          700: '#185abc',
-          800: '#174ea6',
-          900: '#1a4796',
+          50: '#fffbeb',   // Lightest amber
+          100: '#fef3c7',  // Light amber
+          200: '#fde68a',  // Soft amber
+          300: '#fcd34d',  // Medium amber
+          400: '#fbbf24',  // Bright amber
+          500: '#f59e0b',  // Primary amber
+          600: '#d97706',  // Deep amber
+          700: '#b45309',  // Dark amber
+          800: '#92400e',  // Darker amber
+          900: '#78350f',  // Deepest amber
         },
-        // Clean neutrals - Google/Microsoft style
+        // Clean neutrals
         gray: {
           50: '#f8f9fa',   // Background
           100: '#f1f3f4',  // Hover states
@@ -36,23 +36,11 @@ export default {
           800: '#3c4043',  // Strong text
           900: '#202124',  // Headings
         },
-        dark: {
-          50: '#f8f9fa',
-          100: '#f1f3f4',
-          200: '#e8eaed',
-          300: '#dadce0',
-          400: '#bdc1c6',
-          500: '#9aa0a6',
-          600: '#80868b',
-          700: '#5f6368',
-          800: '#3c4043',
-          900: '#202124',
-        },
-        // Semantic colors - Google style
-        success: '#34a853', // Google Green
-        warning: '#fbbc04', // Google Yellow
-        danger: '#ea4335',  // Google Red
-        info: '#4285f4',    // Google Blue alt
+        // Semantic colors - Vendor friendly
+        success: '#16a34a', // Green for profit
+        warning: '#eab308', // Yellow for caution
+        danger: '#dc2626',  // Red for loss/alerts
+        info: '#f59e0b',    // Amber for info
       },
       boxShadow: {
         'sm': '0 1px 2px 0 rgba(60, 64, 67, 0.1), 0 1px 3px 1px rgba(60, 64, 67, 0.08)',

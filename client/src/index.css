@@ -11,11 +11,16 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f8f9fa;
+  background-color: #ffffff;
   color: #202124;
-  overflow: hidden;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -140,11 +145,26 @@ body {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
 .animate-slide-in {
   animation: slideIn 0.2s ease-out forwards;
 }
 
-/* Typing indicator - Google style dots */
+/* Typing indicator - Vendor amber dots */
 .typing-indicator {
   display: flex;
   align-items: center;
@@ -155,7 +175,7 @@ body {
 .typing-dot {
   width: 8px;
   height: 8px;
-  background-color: #1a73e8;
+  background-color: #f59e0b;
   border-radius: 50%;
   animation: typing 1.4s infinite ease-in-out both;
 }
@@ -179,9 +199,9 @@ body {
   }
 }
 
-/* Button styles - Google Material style */
+/* Button styles - Vendor amber style */
 .btn-primary {
-  background-color: #1a73e8;
+  background-color: #f59e0b;
   color: white;
   font-weight: 500;
   padding: 0.5rem 1rem;
@@ -190,28 +210,28 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #1557b0;
-  box-shadow: 0 1px 3px rgba(26, 115, 232, 0.3);
+  background-color: #d97706;
+  box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
 }
 
 .btn-secondary {
   background-color: transparent;
-  color: #1a73e8;
+  color: #f59e0b;
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  border: 1px solid #dadce0;
+  border: 1px solid #fde68a;
   transition: background-color 0.2s;
 }
 
 .btn-secondary:hover {
-  background-color: #f1f3f4;
+  background-color: #fffbeb;
 }
 
 /* Input field styles */
 .input-field {
   background-color: #ffffff;
-  border: 1px solid #dadce0;
+  border: 1px solid #fde68a;
   border-radius: 24px;
   padding: 0.75rem 1rem;
   font-size: 14px;
@@ -220,6 +240,111 @@ body {
 
 .input-field:focus {
   outline: none;
-  border-color: #1a73e8;
-  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  body {
+    font-size: 15px;
+  }
+  
+  /* Prevent zoom on input focus for iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+  
+  /* Better tap targets */
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Reduce padding on mobile */
+  .markdown-content {
+    font-size: 14px;
+  }
+}
+
+/* Dynamic viewport height fix for mobile browsers */
+.h-\[100dvh\] {
+  height: 100dvh;
+  height: -webkit-fill-available;
+}
+
+/* Safe area padding for iOS */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+/* Touch manipulation for better mobile experience */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Slide-in animation for mobile sidebar */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.25s ease-out forwards;
+}
+
+/* Mobile scrollbar hide */
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 0;
+    display: none;
+  }
+  
+  * {
+    scrollbar-width: none;
+  }
+}
+
+/* Charts responsive fix */
+.recharts-wrapper {
+  width: 100% !important;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+/* Modal responsive */
+@media (max-width: 640px) {
+  .modal-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 8px;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.2s ease-out forwards;
 }

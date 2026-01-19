@@ -4,14 +4,14 @@ import axios from 'axios';
  * FinMate API Service Layer
  * 
  * PS.md Alignment:
- * - Clean API abstraction for all server communication
- * - Supports all query types and features from PS
+ * - Clean API abstraction for small business
+ * - Supports CREDIT/DEBIT tracking
+ * - P&L and business insights
  * 
  * Endpoints organized by:
  * - chatAPI: Chat interactions and insights
  * - transactionsAPI: Transaction data management
  * - analysisAPI: Dedicated analysis endpoints
- * - settlementAPI: Group expense settlements
  */
 
 // Use environment variable for API URL, fallback to relative path for proxy
@@ -41,7 +41,7 @@ export const chatAPI = {
   /**
    * Send a message and get AI response
    * @param {string} message - User's message
-   * @param {object} context - Optional context (persona, conversationId)
+   * @param {object} context - Optional context (persona, sessionId)
    */
   sendMessage: async (message, context = {}) => {
     const response = await api.post('/chat', { message, ...context });
@@ -49,7 +49,42 @@ export const chatAPI = {
   },
   
   /**
-   * Get chat history
+   * Get all chat sessions for sidebar
+   */
+  getSessions: async () => {
+    const response = await api.get('/chat/sessions');
+    return response.data;
+  },
+
+  /**
+   * Get a specific session with all messages
+   * @param {string} sessionId - Session ID
+   */
+  getSession: async (sessionId) => {
+    const response = await api.get(`/chat/sessions/${sessionId}`);
+    return response.data;
+  },
+
+  /**
+   * Create a new chat session
+   * @param {string} title - Optional title
+   */
+  createSession: async (title) => {
+    const response = await api.post('/chat/sessions', { title });
+    return response.data;
+  },
+
+  /**
+   * Delete a chat session
+   * @param {string} sessionId - Session ID
+   */
+  deleteSession: async (sessionId) => {
+    const response = await api.delete(`/chat/sessions/${sessionId}`);
+    return response.data;
+  },
+
+  /**
+   * Get chat history (legacy - returns current session)
    */
   getHistory: async () => {
     const response = await api.get('/chat/history');
@@ -57,7 +92,7 @@ export const chatAPI = {
   },
   
   /**
-   * Clear chat history
+   * Clear all chat history
    */
   clearHistory: async () => {
     const response = await api.delete('/chat/history');
@@ -228,7 +263,18 @@ export const transactionsAPI = {
    * @param {array} ids - Array of transaction IDs to delete
    */
   deleteBatch: async (ids) => {
-    const response = await api.post('/transactions/delete-batch', { ids });
+    const response = await api.delete('/transactions/batch', { 
+      data: { transactionIds: ids }
+    });
+    return response.data;
+  },
+
+  /**
+   * Delete transactions by source file
+   * @param {string} sourceFile - Source file name
+   */
+  deleteBySource: async (sourceFile) => {
+    const response = await api.delete(`/transactions/by-source?sourceFile=${encodeURIComponent(sourceFile)}`);
     return response.data;
   },
 
@@ -312,45 +358,6 @@ export const analysisAPI = {
 };
 
 /**
- * Settlement API - Group expense functionality
- */
-export const settlementAPI = {
-  /**
-   * Get current balances
-   * PS: "Who owes what?"
-   */
-  getBalances: async () => {
-    const response = await api.get('/settlements/balances');
-    return response.data;
-  },
-
-  /**
-   * Calculate optimal settlements
-   * PS: "Settle up"
-   */
-  calculateSettlements: async () => {
-    const response = await api.get('/settlements/calculate');
-    return response.data;
-  },
-
-  /**
-   * Confirm and record settlement
-   */
-  confirmSettlement: async (settlements) => {
-    const response = await api.post('/settlements/confirm', { settlements });
-    return response.data;
-  },
-
-  /**
-   * Get settlement history
-   */
-  getHistory: async () => {
-    const response = await api.get('/settlements/history');
-    return response.data;
-  }
-};
-
-/**
  * Health Check
  */
 export const healthCheck = async () => {
@@ -363,6 +370,5 @@ export default {
   chat: chatAPI,
   transactions: transactionsAPI,
   analysis: analysisAPI,
-  settlements: settlementAPI,
   healthCheck
 };
