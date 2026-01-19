@@ -1,268 +1,495 @@
-# FinMate - Smart Roommate Expense Manager 💰
+# 🪙 FinMate - Your AI Financial Co-Pilot
 
-An AI-native financial co-pilot for roommates, built for the **ENCODE | UDGIAM | Code To Innovate** hackathon. Features conversational UI, **TRUE runtime Generative UI via Thesys CI**, intelligent financial insights, and advanced financial analysis.
+<div align="center">
+  <img src="client/public/logo.png" alt="FinMate Logo" width="140" height="140" />
+  
+  ### **Stop reading spreadsheets. Start understanding your money.**
+  
+  A conversational AI assistant that transforms how small vendors manage finances—<br/>
+  turning raw transactions into visual insights and confident decisions.
 
-**Target Persona**: Roommates splitting expenses (FairShare)
+  <br/>
 
-## ⚡ Key Differentiator: True GenUI
+  [![ENCODE UDGIAM](https://img.shields.io/badge/🏆%20ENCODE-UDGIAM%202026-FFD700?style=for-the-badge)](https://encode.udgiam.com)
+  [![Thesys CI](https://img.shields.io/badge/Powered%20by-Thesys%20CI-6366F1?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkw0IDdWMTdMIDEyIDIyTDIwIDE3VjdMMTIgMloiIGZpbGw9IndoaXRlIi8+PC9zdmc+)](https://thesys.dev/)
+  
+  <br/>
 
-Unlike apps that select from pre-built components, **FinMate uses Thesys CI to generate UI specifications at runtime**:
+  ![React](https://img.shields.io/badge/React-18.2-61DAFB?logo=react&logoColor=white)
+  ![Node.js](https://img.shields.io/badge/Node.js-18+-339933?logo=node.js&logoColor=white)
+  ![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38B2AC?logo=tailwind-css&logoColor=white)
+  ![Claude](https://img.shields.io/badge/Claude-Sonnet%204-CC785C?logo=anthropic&logoColor=white)
+
+</div>
+
+---
+
+## 📺 Demo Video
+
+> 🎬 **[Watch 2-minute Demo →](https://youtube.com/watch?v=YOUR_VIDEO_ID)**
+>
+> See FinMate transform a small tea vendor's confusion into clarity.
+
+---
+
+## 🎯 The Problem We're Solving
+
+<table>
+<tr>
+<td width="50%">
+
+### ❌ Traditional Finance Apps
 
 ```
-User Query → AI Analyzes Data → Thesys Generates UI Spec → React Renders Dynamic Components
+📋 Endless transaction lists
+📊 Static reports you don't understand
+🤔 Manual categorization
+⏰ Problems found AFTER money is gone
+❓ "What does this even mean?"
 ```
 
-- **Not template selection** - The AI generates the exact chart data, metrics, and layout needed
-- **Truly adaptive** - Each response creates unique UI tailored to the specific question
-- **Runtime generation** - Components are specified by AI, rendered by React at runtime
+</td>
+<td width="50%">
 
-See [ThesysGenUI.jsx](client/src/components/ThesysGenUI.jsx) and [thesysGenUI.js](server/services/thesysGenUI.js) for implementation.
+### ✅ FinMate Experience
 
-## 🌟 Features
+```
+💬 "Why did I spend so much?"
+📈 AI picks the right chart instantly
+🔍 Automatic anomaly detection
+⚡ Proactive alerts BEFORE issues
+💡 "Here's what you should do..."
+```
 
-### Core Features
-- **AI-Native Experience**: Conversational interface powered by Thesys GenUI / Gemini
-- **Runtime GenUI**: Dynamic charts, metrics, lists, and flows generated at runtime (not pre-built)
-- **Smart Settlement**: Splitwise-style debt calculation (Who owes whom?)
-- **Simulation Mode**: "What-if" scenarios (rent increase, new roommate, etc.)
-- **Mobile Responsive**: Works on all devices
+</td>
+</tr>
+</table>
 
-### Advanced Features
-- **Multi-Source Data Import**: Import from bank statements (CSV), SMS alerts, and email notifications
-- **Proactive Insights**: AI detects anomalies and suggests actions automatically
-- **Anomaly Detection**: Automatically identifies unusual spending patterns with severity levels
-- **Period Comparison**: Side-by-side comparison of spending across different time periods
-- **Decision Guidance**: Interactive step-by-step guides for financial decisions
-- **Chain-of-Thought Reasoning**: See how AI arrived at conclusions
-- **Honest Uncertainty**: Every AI response shows confidence score with reasons and assumptions
-- **Calculation Breakdown**: See the math behind every calculation
-- **Persistent Memory**: Conversation context and learned patterns saved across sessions
+---
 
-### Data Import
-- **CSV Upload**: Import transaction data from CSV files
-- **Bank Statement Parser**: Parse HDFC, ICICI, SBI, Axis, and other bank statement formats (8 banks supported)
-- **SMS Parser**: Extract transaction data from bank SMS alerts
-- **Learning System**: Parser improves from corrections over time
+## 🎪 Target Persona: Small Vendor (Tea Shop Owner)
 
-## 🏗️ Project Structure
+Meet **Ramu**, a chai vendor in Delhi who earns ₹40,000/month. He has:
+- 📱 UPI transactions flooding his phone
+- 📦 Daily inventory purchases to track
+- 🏠 Rent, utilities, and supplies to manage
+- ❓ No idea if his business is actually profitable
+
+**FinMate becomes Ramu's financial partner** — answering questions in plain Hindi/English, showing visual breakdowns, and guiding him to better decisions.
+
+---
+
+## ✨ Key Features
+
+### 🧠 1. AI-Native Conversation
+> *"It feels like talking to a smart accountant friend"*
+
+- Natural language understanding ("Why did expenses spike?")
+- Smart clarifications when questions are vague
+- Context-aware responses that remember your situation
+- Proactive insights you didn't ask for but needed
+
+### 📊 2. Dynamic Generative UI
+> *"The right chart appears at the right moment"*
+
+| Your Question | AI Response |
+|---------------|-------------|
+| "Show breakdown" | 🥧 Pie chart with drill-down |
+| "Compare weeks" | 📊 Bar chart comparison |
+| "Show trend" | 📈 Timeline chart |
+| "List transactions" | 📋 Interactive list |
+| "What if I cut 20%?" | 🎚️ Simulation slider |
+
+### 🔍 3. Intelligent Pattern Detection
+> *"It catches things I would have missed"*
+
+- **Anomaly Alerts**: "₹1,200 inventory purchase is 140% above your average"
+- **Change Detection**: "Expenses up 23% vs last week"
+- **Trend Analysis**: "Weekends bring 60% more revenue"
+
+### 💡 4. Reasoning & Explainability
+> *"I can see HOW it reached that conclusion"*
+
+Every insight includes:
+- **Analysis Steps**: "Looked at 15 transactions → Found pattern → Conclusion"
+- **Confidence Level**: High / Medium / Low with reasoning
+- **Assumptions Made**: When data is incomplete
+
+### 🎯 5. Decision Guidance
+> *"It doesn't just show data, it tells me what to DO"*
+
+- Actionable recommendations with justification
+- "What if?" scenario simulations
+- Step-by-step decision guides
+
+---
+
+## 🏗️ System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          👤 USER INTERFACE                               │
+│  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  ┌──────────────┐  │
+│  │ ChatWindow  │  │ ThesysGenUI  │  │   Charts    │  │  Features    │  │
+│  │ (Messages)  │  │ (Renderer)   │  │ (Recharts)  │  │ (Anomaly/Sim)│  │
+│  └──────┬──────┘  └──────┬───────┘  └──────┬──────┘  └──────┬───────┘  │
+│         └─────────────────┴─────────────────┴─────────────────┘         │
+│                                    │                                     │
+│                          React + Vite + Tailwind                        │
+└────────────────────────────────────┼────────────────────────────────────┘
+                                     │ HTTP/REST
+                                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                          🖥️ EXPRESS SERVER                              │
+│  ┌────────────────┐  ┌─────────────────┐  ┌────────────────────────┐  │
+│  │  /api/chat     │  │ /api/transactions│  │    /api/analysis       │  │
+│  │  - Sessions    │  │ - Upload CSV     │  │    - Stats             │  │
+│  │  - Messages    │  │ - CRUD           │  │    - Anomalies         │  │
+│  │  - AI Query    │  │ - Parse          │  │    - Comparisons       │  │
+│  └───────┬────────┘  └─────────┬────────┘  └───────────┬────────────┘  │
+│          └──────────────────────┴──────────────────────┘               │
+│                                 │                                       │
+└─────────────────────────────────┼───────────────────────────────────────┘
+                                  │
+        ┌─────────────────────────┴─────────────────────────┐
+        ▼                                                   ▼
+┌───────────────────────┐                    ┌──────────────────────────┐
+│   🤖 THESYS CI API    │                    │   💾 LOCAL STORAGE       │
+│  ┌─────────────────┐  │                    │  ┌────────────────────┐  │
+│  │ Claude Sonnet 4 │  │                    │  │   Transactions     │  │
+│  │ Generative UI   │  │                    │  │   Chat Sessions    │  │
+│  │ RAG Context     │  │                    │  │   Analytics        │  │
+│  └─────────────────┘  │                    │  └────────────────────┘  │
+└───────────────────────┘                    └──────────────────────────┘
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology | Why We Chose It |
+|-------|------------|-----------------|
+| **Frontend** | React 18 + Vite | Fast HMR, modern hooks |
+| **Styling** | Tailwind CSS | Rapid UI iteration |
+| **Charts** | Recharts | Interactive, React-native |
+| **AI Engine** | Thesys CI | Generative UI + Claude Sonnet 4 |
+| **Backend** | Express.js | Lightweight, flexible |
+| **Storage** | node-localstorage | Simple, no DB setup needed |
+| **Data Parsing** | csv-parse | Robust CSV handling |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- Thesys CI API Key ([Get free $100 credits](https://tally.so/r/QKRMrg))
+
+### 1️⃣ Clone & Install
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/finmate.git
+cd finmate
+
+# Install server dependencies
+cd server && npm install
+
+# Install client dependencies
+cd ../client && npm install
+```
+
+### 2️⃣ Configure Environment
+
+```bash
+# In /server directory, create .env file
+cd ../server
+```
+
+Create `.env` with:
+```env
+PORT=5000
+THESYS_API_KEY=your_thesys_api_key_here
+THESYS_API_URL=https://api.thesys.dev/v1/embed/chat/completions
+THESYS_MODEL=c1/anthropic/claude-sonnet-4
+```
+
+### 3️⃣ Start Development Servers
+
+**Terminal 1 - Server:**
+```bash
+cd server
+npm run dev
+# ✅ Server running on http://localhost:5000
+```
+
+**Terminal 2 - Client:**
+```bash
+cd client
+npm run dev
+# ✅ Client running on http://localhost:5173
+```
+
+### 4️⃣ Load Sample Data
+
+1. Open `http://localhost:5173`
+2. Click **"Upload Transactions"** in sidebar
+3. Upload `sample-data/1-month-sample.csv`
+4. Start chatting! 🎉
+
+---
+
+## 📁 Project Structure
 
 ```
 FinMate/
-├── client/                 # React Frontend (Vite)
+├── 📂 client/                      # React Frontend
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ChatWindow.jsx        # Main chat interface
-│   │   │   ├── MessageBubble.jsx     # Chat message + confidence display
-│   │   │   ├── Sidebar.jsx           # Navigation + Financial Summary
-│   │   │   ├── DynamicComponentRenderer.jsx  # Generative UI Engine
-│   │   │   ├── ThesysGenUI.jsx       # ⚡ Runtime GenUI Renderer
-│   │   │   ├── InteractiveChart.jsx  # Drill-down enabled charts
-│   │   │   ├── SimulationSlider.jsx  # What-if scenarios with sliders
-│   │   │   ├── ReasoningSteps.jsx    # Chain-of-thought display
-│   │   │   ├── ChangeDetection.jsx   # Proactive change alerts
-│   │   │   ├── ComparisonView.jsx    # Period comparison charts
-│   │   │   ├── AnomalyCard.jsx       # Anomaly detection display
-│   │   │   └── DecisionGuide.jsx     # Guided decision flow
+│   │   │   ├── 📊 charts/          # Interactive visualizations
+│   │   │   │   ├── InteractiveChart.jsx
+│   │   │   │   └── ComparisonView.jsx
+│   │   │   ├── 🔍 features/        # AI-powered features
+│   │   │   │   ├── AnomalyCard.jsx
+│   │   │   │   ├── ChangeDetection.jsx
+│   │   │   │   ├── DecisionGuide.jsx
+│   │   │   │   └── SimulationSlider.jsx
+│   │   │   ├── 🖼️ layout/          # App structure
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   ├── CSVUpload.jsx
+│   │   │   │   └── DataManager.jsx
+│   │   │   ├── 🧩 ui/              # Reusable components
+│   │   │   │   ├── ClarificationOptions.jsx
+│   │   │   │   ├── ConfidenceBadge.jsx
+│   │   │   │   └── ReasoningSteps.jsx
+│   │   │   ├── 💬 ChatWindow.jsx   # Main chat interface
+│   │   │   ├── 💭 MessageBubble.jsx
+│   │   │   └── 🎨 ThesysGenUI.jsx  # Generative UI Renderer ⭐
 │   │   ├── services/
-│   │   │   └── api.js
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── package.json
-│   └── vite.config.js
+│   │   │   └── api.js              # API client
+│   │   └── App.jsx
+│   └── package.json
 │
-├── server/                 # Node.js Backend
-│   ├── config/
-│   │   └── systemPrompt.js  # AI personality & instructions
-│   ├── data/
-│   │   └── transactions.json  # Mock financial data
+├── 📂 server/                      # Express Backend
 │   ├── routes/
-│   │   └── chat.js          # Chat logic + local fallback
+│   │   ├── chat.js                 # Chat endpoints
+│   │   ├── transactions.js         # Transaction CRUD
+│   │   └── analysis.js             # Analytics
 │   ├── services/
-│   │   ├── thesysGenUI.js   # ⚡ Thesys GenUI Integration (runtime generation)
-│   │   ├── thesys.js        # Legacy Thesys API
-│   │   ├── nlpEngine.js     # Intent detection + clarification
-│   │   ├── patternLearning.js  # Learns user spending patterns
-│   │   ├── conversationMemory.js  # Persistent conversation context
-│   │   ├── pdfParser.js     # Bank statement parser (8 banks)
-│   │   └── statementParser.js  # Bank statement & SMS parser
-│   ├── server.js
-│   ├── package.json
-│   └── .env.example
+│   │   ├── 🤖 llm.js               # Thesys CI integration ⭐
+│   │   └── 💾 db.js                # Database layer
+│   ├── data/storage/               # Persisted data
+│   └── package.json
+│
+├── 📂 sample-data/                 # Demo datasets
+│   ├── 1-month-sample.csv          # Quick demo (45 txns)
+│   ├── 6-month-sample.csv          # Trend analysis
+│   └── 12-month-sample.csv         # Full year patterns
 │
 └── README.md
 ```
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 💬 Example Conversations
 
-- Node.js 18+ installed
-- npm or yarn
-- API Keys (Thesys and/or Gemini)
+### Vague Query → Smart Clarification
+```
+👤 User: "How am I doing?"
 
-### Installation
-
-1. **Clone and navigate to the project:**
-   ```bash
-   cd FinMate
-   ```
-
-2. **Install server dependencies:**
-   ```bash
-   cd server
-   npm install
-   ```
-
-3. **Configure environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your API keys
-   ```
-
-4. **Install client dependencies:**
-   ```bash
-   cd ../client
-   npm install
-   ```
-
-### Running the Application
-
-1. **Start the backend server (Terminal 1):**
-   ```bash
-   cd server
-   npm run dev
-   ```
-   Server runs on http://localhost:5000
-
-2. **Start the frontend (Terminal 2):**
-   ```bash
-   cd client
-   npm run dev
-   ```
-   Client runs on http://localhost:3000
-
-3. **Open your browser** and go to http://localhost:3000
-
-## 💬 Sample Queries
-
-Try these prompts in the chat:
-
-### Analysis
-- "Who spent the most this month?"
-- "Show me unpaid bills"
-- "Break down spending by category"
-- "Who owes money to whom?"
-- "Show spending timeline"
-- "Show all food transactions"
-
-### Advanced Analysis
-- "Detect anomalies in spending"
-- "Compare this month vs last month"
-- "What should I do next?" (Decision guidance)
-- "Show calculation breakdown" (Step-by-step math)
-
-### Simulations (What-If)
-- "What if rent increases by 15%?"
-- "What if we add a 4th roommate?"
-- "What if Amit moves out?"
-- "Plan next month's budget"
-
-## 🎨 UI Components (Generative UI)
-
-The app dynamically renders these components based on AI responses:
-
-| Component | Trigger | Use Case |
-|-----------|---------|----------|
-| **Bar Chart** | Spending comparisons | Who paid most? Rent vs projected |
-| **Pie Chart** | Category breakdown | Where is money going? |
-| **Line Chart**| Trend analysis | Spending over time (Timeline) |
-| **Transaction Table** | Bill listings | Pending bills, mark as paid, Filtered views |
-| **Settlement Card** | Debt calculations | Who owes whom, balances |
-| **Comparison View** | Period analysis | This month vs last month |
-| **Anomaly Card** | Unusual spending | Detected spending anomalies |
-| **Decision Guide** | Next steps | Interactive action guides |
-
-## 🔧 API Configuration
-
-### Thesys GenUI (Primary)
-Request $100 free credits: https://tally.so/r/QKRMrg
-
-```env
-THESYS_API_KEY=your_thesys_key
-THESYS_API_URL=https://api.thesys.dev/v1/generate
-THESYS_MODEL=thesys-genui-1
+🤖 FinMate: "I can help you understand your finances! 
+            What would you like to know?"
+            
+            [📊 This Week's Summary]
+            [📈 Compare to Last Week]  
+            [🔍 Show Unusual Spending]
 ```
 
-### Google Gemini (Fallback)
-Get API key: https://ai.google.dev/
+### Expense Analysis with Reasoning
+```
+👤 User: "Show my expenses"
 
-```env
-GEMINI_API_KEY=your_gemini_key
+🤖 FinMate: 
+   ┌─────────────────────────────────────┐
+   │ 🧠 My Analysis                       │
+   │ ────────────────────────────────────│
+   │ 1. Analyzed 15 transactions          │
+   │ 2. Grouped by category               │
+   │ 3. Inventory = 53% of total          │
+   │ 4. Found 3 unusually high purchases  │
+   │                                      │
+   │ 💡 Inventory costs are your biggest  │
+   │    expense driver                    │
+   │                     [High Confidence]│
+   └─────────────────────────────────────┘
+   
+   [🥧 Pie Chart: Category Breakdown]
+   
+   💡 Recommendation: Consider negotiating 
+      bulk discounts to reduce inventory costs.
+      
+   [Drill into Inventory] [Compare Weeks] [Simulate Cuts]
 ```
 
-The system automatically falls back: **Thesys → Gemini → Local Rules**
+### What-If Simulation
+```
+👤 User: "What if I cut inventory by 20%?"
 
-## 📊 Mock Data
-
-The app includes sample transaction data for 3 roommates:
-- **Rahul** - Pays most utilities
-- **Priya** - Handles groceries
-- **Amit** - Entertainment & subscriptions
-
-Categories: Rent, Utilities, Groceries, Food, Entertainment, Household
-
-## 🛠️ Tech Stack
-
-- **Frontend**: React 18, Vite, Tailwind CSS, Recharts, Lucide Icons
-- **Backend**: Node.js, Express
-- **AI**: Thesys GenUI (primary), Google Gemini (fallback)
-- **API**: RESTful endpoints for chat and transactions
-
-## 📝 API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/chat` | Send a message |
-| GET | `/api/chat/history` | Get chat history |
-| DELETE | `/api/chat/history` | Clear history |
-| GET | `/api/chat/proactive` | Get proactive insights |
-| GET | `/api/transactions` | Get all transactions |
-| POST | `/api/transactions/upload` | Upload CSV transactions |
-| PATCH | `/api/transactions/:id` | Update transaction status |
-| POST | `/api/transactions/parse-statement` | Parse bank statement file |
-| POST | `/api/transactions/parse-text` | Parse SMS/email text |
-| POST | `/api/transactions/confirm-import` | Confirm and import parsed transactions |
-| GET | `/api/transactions/anomalies` | Detect spending anomalies |
-| GET | `/api/health` | Health check |
-
-## 🎯 Judging Criteria Alignment
-
-| Criteria | Implementation |
-|----------|----------------|
-| **AI-Native Experience (50%)** | ✅ Conversational UI, intent inference, dynamic Generative UI with Thesys, proactive insights with anomaly detection, confidence levels on responses |
-| **Reasoning & Explainability (30%)** | ✅ Detailed insights, debt math with calculation breakdown, simulation comparisons, period comparison view, decision guides |
-| **Technical Execution (20%)** | ✅ Clean architecture, smart fallback chain (Thesys→Gemini→Local), multi-source data import, interactive components, localStorage persistence |
-
-## 🆕 Recent Enhancements
-
-### v2.0 Features
-- **🔍 Anomaly Detection**: Automatically identifies unusual spending patterns
-- **📊 Period Comparison**: Compare spending across different time periods
-- **🎯 Decision Guidance**: Step-by-step guides for financial decisions  
-- **🛡️ Confidence Levels**: See AI confidence (High/Medium/Low) on every response
-- **📱 Multi-Source Import**: Import from bank CSV, SMS alerts, email notifications
-- **🧮 Calculation Breakdown**: See step-by-step math behind calculations
-- **💾 Persistent Memory**: Chat history saved across browser sessions
-
-## 🤝 Contributing
-
-Feel free to submit issues and pull requests!
-
-## 📄 License
-
-MIT License - feel free to use for your hackathon!
+🤖 FinMate:
+   ┌─────────────────────────────────────┐
+   │ 🎚️ Budget Simulation                │
+   │ ────────────────────────────────────│
+   │ Current Inventory: ₹5,200/week      │
+   │ After 20% cut:     ₹4,160/week      │
+   │ Monthly Savings:   ₹4,160           │
+   │                                      │
+   │ ⚠️ Risk: May cause stockouts on     │
+   │    high-demand days (Sat-Sun)       │
+   └─────────────────────────────────────┘
+   
+   [Try 10% instead] [Show demand patterns] [How to optimize?]
+```
 
 ---
 
-Built with ❤️ for **ENCODE | UDGIAM | Code To Innovate** Hackathon
+## 🔌 API Reference
+
+### Chat
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/chat` | Send message, get AI response |
+| `GET` | `/api/chat/sessions` | List chat sessions |
+| `POST` | `/api/chat/sessions` | Create new session |
+| `DELETE` | `/api/chat/sessions/:id` | Delete session |
+
+### Transactions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/transactions` | List transactions |
+| `POST` | `/api/transactions/upload` | Upload CSV |
+| `DELETE` | `/api/transactions/:id` | Delete transaction |
+
+### Analysis
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/analysis/stats` | Financial statistics |
+| `GET` | `/api/analysis/anomalies` | Detected anomalies |
+| `GET` | `/api/analysis/comparison` | Week comparison |
+
+---
+
+## 📊 Generative UI Components
+
+FinMate dynamically generates these UI components via Thesys CI:
+
+| Component | Triggered By | Purpose |
+|-----------|--------------|---------|
+| `PieChartV2` | "breakdown", "distribution" | Category analysis |
+| `BarChartV2` | "compare", "vs", "difference" | Period comparison |
+| `LineChartV2` | "trend", "over time", "pattern" | Timeline view |
+| `ReasoningBlock` | Every response | Show AI's thinking |
+| `MiniCardBlock` | Summary queries | Key metrics |
+| `AnomalyCard` | Unusual patterns | Alert highlights |
+| `SimulationSlider` | "what if", "simulate" | Budget scenarios |
+| `DecisionGuide` | Action queries | Step-by-step help |
+| `FollowUpBlock` | Every response | Drill-down options |
+
+---
+
+## 🏆 Hackathon Alignment
+
+### Judging Criteria Coverage
+
+| Criteria | Weight | Our Implementation |
+|----------|--------|-------------------|
+| **AI-Native Experience** | 50% | ✅ Natural language, adaptive UI, proactive insights, smart clarifications |
+| **Reasoning & Explainability** | 30% | ✅ ReasoningBlock in every response, confidence indicators, assumption transparency |
+| **Technical Execution** | 20% | ✅ Clean architecture, Thesys CI integration, proper error handling |
+
+### PS.md Requirements Checklist
+
+- [x] Gather data from sources (CSV, bank statements)
+- [x] Understand natural language questions
+- [x] Choose best visualization for each answer
+- [x] Break confusing data into clear views
+- [x] Let users zoom in, filter, explore
+- [x] Adapt UI as conversation evolves
+- [x] Guide from "What happened?" to "What should I do?"
+- [x] Ask smart follow-up questions
+- [x] Compare, simulate, explore scenarios
+- [x] Surface insights, surprises, and risks
+- [x] End conversations with clarity and agency
+
+---
+
+## 📂 Sample Data
+
+The `sample-data/` folder contains ready-to-use datasets:
+
+| File | Duration | Transactions | Best For |
+|------|----------|--------------|----------|
+| `1-month-sample.csv` | 30 days | ~45 | Quick demo |
+| `6-month-sample.csv` | 180 days | ~180 | Trend analysis |
+| `12-month-sample.csv` | 365 days | ~365 | Full patterns |
+
+**CSV Format:**
+```csv
+date,type,amount,category,description
+2026-01-15,CREDIT,1500,Sales,Morning sales
+2026-01-15,DEBIT,500,Inventory,Stock purchase
+```
+
+---
+
+## 🔐 Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `PORT` | No | 5000 | Server port |
+| `THESYS_API_KEY` | **Yes** | - | Your Thesys CI API key |
+| `THESYS_API_URL` | No | `https://api.thesys.dev/...` | API endpoint |
+| `THESYS_MODEL` | No | `c1/anthropic/claude-sonnet-4` | AI model |
+
+---
+
+## 🚧 Future Roadmap
+
+- [ ] Bank statement PDF parsing
+- [ ] SMS/Email transaction extraction
+- [ ] Multi-language support (Hindi, Tamil, etc.)
+- [ ] Mobile app (React Native)
+- [ ] Voice input/output
+- [ ] Export reports as PDF
+- [ ] WhatsApp integration
+
+---
+
+## 👥 Team
+
+Built with ❤️ for **ENCODE | UDGIAM | Code To Innovate 2026**
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file.
+
+---
+
+## 🙏 Acknowledgments
+
+- **[Thesys](https://thesys.dev/)** - Generative UI platform & credits
+- **[ENCODE | UDGIAM](https://encode.udgiam.com)** - Hackathon organizers
+- **[Recharts](https://recharts.org/)** - Charting library
+- **[Tailwind CSS](https://tailwindcss.com/)** - Styling framework
+- **[Lucide](https://lucide.dev/)** - Icon library
+
+---
+
+<div align="center">
+
+### 🪙 FinMate - *Because understanding your money shouldn't require a finance degree.*
+
+**[🎬 Watch Demo](https://youtube.com/watch?v=YOUR_VIDEO_ID)** · **[🐛 Report Bug](https://github.com/yourusername/finmate/issues)** · **[💡 Request Feature](https://github.com/yourusername/finmate/issues)**
+
+</div>

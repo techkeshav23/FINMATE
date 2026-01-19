@@ -1,0 +1,83 @@
+date,type,amount,category,description
+2025-08-01,CREDIT,1800,Sales,August opening
+2025-08-02,DEBIT,600,Inventory,Monthly stock
+2025-08-03,CREDIT,2100,Sales,Weekend sales
+2025-08-05,DEBIT,1800,Rent,Monthly rent
+2025-08-07,CREDIT,1650,Sales,Weekday business
+2025-08-08,DEBIT,350,Utilities,Electricity
+2025-08-10,CREDIT,2400,Sales,Good weekend
+2025-08-12,DEBIT,500,Inventory,Restock
+2025-08-14,CREDIT,1900,Sales,Independence Day prep
+2025-08-15,CREDIT,3500,Sales,Independence Day rush
+2025-08-15,DEBIT,800,Inventory,Festival stock
+2025-08-17,CREDIT,2000,Sales,Post holiday
+2025-08-20,DEBIT,400,Supplies,Packaging
+2025-08-22,CREDIT,1750,Sales,Regular day
+2025-08-25,DEBIT,450,Staff,Helper wages
+2025-08-27,CREDIT,2200,Sales,Month end
+2025-08-30,DEBIT,300,Maintenance,Repairs
+2025-09-01,CREDIT,1900,Sales,September start
+2025-09-03,DEBIT,700,Inventory,New month stock
+2025-09-05,CREDIT,2300,Sales,Weekend crowd
+2025-09-07,DEBIT,1800,Rent,Monthly rent
+2025-09-10,CREDIT,1600,Sales,Slow week
+2025-09-12,DEBIT,280,Utilities,Water bill
+2025-09-15,CREDIT,2100,Sales,Mid month
+2025-09-17,DEBIT,550,Inventory,Restock
+2025-09-20,CREDIT,2500,Sales,Good weekend
+2025-09-22,DEBIT,200,Transport,Delivery
+2025-09-25,CREDIT,1850,Sales,Regular business
+2025-09-28,DEBIT,450,Staff,Helper payment
+2025-09-30,CREDIT,2000,Sales,Month end
+2025-10-01,CREDIT,2200,Sales,October beginning
+2025-10-03,DEBIT,900,Inventory,Festive prep stock
+2025-10-05,DEBIT,1800,Rent,Monthly rent
+2025-10-07,CREDIT,2800,Sales,Pre-Diwali rush
+2025-10-10,CREDIT,3200,Sales,Diwali shopping
+2025-10-12,DEBIT,1200,Inventory,Festival inventory
+2025-10-15,CREDIT,4500,Sales,Diwali week peak
+2025-10-17,DEBIT,600,Supplies,Gift packaging
+2025-10-20,CREDIT,3800,Sales,Diwali sales
+2025-10-22,DEBIT,500,Staff,Extra help
+2025-10-25,CREDIT,2500,Sales,Post Diwali
+2025-10-27,DEBIT,350,Utilities,Electricity
+2025-10-30,CREDIT,1900,Sales,Month end
+2025-11-01,CREDIT,1700,Sales,November start
+2025-11-03,DEBIT,650,Inventory,Regular stock
+2025-11-05,DEBIT,1800,Rent,Monthly rent
+2025-11-07,CREDIT,1850,Sales,Weekday
+2025-11-10,CREDIT,2100,Sales,Weekend
+2025-11-12,DEBIT,400,Maintenance,Equipment service
+2025-11-15,CREDIT,1950,Sales,Mid month
+2025-11-17,DEBIT,500,Inventory,Restock
+2025-11-20,CREDIT,2300,Sales,Good weekend
+2025-11-22,DEBIT,280,Utilities,Water
+2025-11-25,CREDIT,1800,Sales,Regular
+2025-11-27,DEBIT,450,Staff,Wages
+2025-11-30,CREDIT,2000,Sales,Month end
+2025-12-01,CREDIT,2100,Sales,December start
+2025-12-03,DEBIT,800,Inventory,Winter stock
+2025-12-05,DEBIT,1800,Rent,Monthly rent
+2025-12-07,CREDIT,2400,Sales,Weekend crowd
+2025-12-10,CREDIT,2200,Sales,Weekday good
+2025-12-12,DEBIT,350,Supplies,Packaging
+2025-12-15,CREDIT,2600,Sales,Mid month
+2025-12-17,DEBIT,600,Inventory,Restock
+2025-12-20,CREDIT,2900,Sales,Pre-Christmas
+2025-12-22,DEBIT,400,Transport,Bulk delivery
+2025-12-25,CREDIT,3800,Sales,Christmas rush
+2025-12-25,DEBIT,700,Inventory,Emergency stock
+2025-12-27,CREDIT,2500,Sales,Year end shopping
+2025-12-30,DEBIT,500,Staff,Year end bonus
+2025-12-31,CREDIT,4200,Sales,New Year Eve
+2026-01-01,CREDIT,3500,Sales,New Year
+2026-01-01,DEBIT,900,Inventory,New stock
+2026-01-03,DEBIT,1800,Rent,January rent
+2026-01-05,CREDIT,2200,Sales,Weekend
+2026-01-07,DEBIT,380,Utilities,Electricity
+2026-01-10,CREDIT,1900,Sales,Weekday
+2026-01-12,CREDIT,2400,Sales,Weekend sales
+2026-01-12,DEBIT,550,Inventory,Restock
+2026-01-15,CREDIT,2000,Sales,Mid month
+2026-01-17,DEBIT,300,Maintenance,Repairs
+2026-01-19,CREDIT,2600,Sales,Current day
