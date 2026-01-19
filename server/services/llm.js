@@ -121,12 +121,15 @@ For questions like "what changed", "why is profit down", "what's different":
 - Explain the change clearly
 
 ═══════════════════════════════════════════════════════════════════
-🔴 DRILL-DOWN SUGGESTIONS (Interactive Exploration)
+🔴 DRILL-DOWN SUGGESTIONS (EXACTLY 3 - NO MORE!)
 ═══════════════════════════════════════════════════════════════════
-After EVERY answer, add FollowUpBlock with related deeper queries:
-- After expense breakdown → ["Drill into Inventory", "Show Rent Details", "Compare to Last Week"]
-- After showing anomalies → ["Why is this high?", "Show similar transactions", "Set alert for this"]
-- After trend chart → ["What caused the dip?", "Compare weekday vs weekend", "Predict next week"]
+**IMPORTANT: Add ONLY ONE FollowUpBlock with EXACTLY 3 options at the END of your response.**
+**DO NOT add multiple FollowUpBlocks or more than 3 options - it clutters the UI!**
+
+Examples of good follow-ups (pick 3 most relevant):
+- After expense breakdown → ["Drill into Inventory", "Compare to Last Week", "How to reduce costs?"]
+- After showing anomalies → ["Why is this high?", "Show all anomalies", "Ignore this"]
+- After trend chart → ["What caused the dip?", "Predict next week", "Show daily breakdown"]
 
 ═══════════════════════════════════════════════════════════════════
 **UNDERSTANDING USER INTENT**
@@ -288,13 +291,12 @@ For Recommendations (USE DecisionJustification):
 }
 
 REMEMBER: 
-1. EVERY response MUST have ReasoningBlock - NO EXCEPTIONS!
+1. EVERY response MUST have ReasoningBlock with 3-4 SHORT steps (not verbose paragraphs).
 2. EVERY response MUST have at least ONE chart (PieChartV2, BarChartV2, or LineChartV2).
-3. For vague queries, ask clarification FIRST using FollowUpBlock.
-4. ALWAYS add FollowUpBlock at the end for drill-down exploration.
-5. Use AssumptionsBlock when data is incomplete or you're making assumptions.
-6. Use DecisionJustification when giving actionable recommendations.
-7. Text-only responses are NOT acceptable.
+3. Add ONLY ONE FollowUpBlock at the END with EXACTLY 3 options - NO MORE!
+4. DO NOT add multiple sets of buttons/follow-ups - this clutters the UI.
+5. Keep ReasoningBlock steps SHORT: "Analyzed 38 transactions" NOT "I analyzed all 38 transactions from your import"
+6. Text-only responses are NOT acceptable.
 `;
 
 class LLMService {

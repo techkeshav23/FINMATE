@@ -165,15 +165,14 @@ function App() {
       // Add to sessions list
       setSessions(prev => [newSession, ...prev]);
       setCurrentSessionId(newSession.id);
-      setMessages([]);
+      setMessages([]); // Start fresh - no proactive insight on New Chat
       clearSavedMessages();
       setSidebarOpen(false);
-      await loadWelcomeMessage();
+      // Don't load proactive insights on manual New Chat - user wants fresh start
     } catch (err) {
       console.error('Failed to create new chat:', err);
       setMessages([]);
       clearSavedMessages();
-      await loadWelcomeMessage();
     }
   }, [clearSavedMessages]);
 
