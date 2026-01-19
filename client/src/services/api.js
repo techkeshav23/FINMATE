@@ -17,6 +17,21 @@ import axios from 'axios';
 // Use environment variable for API URL, fallback to relative path for proxy
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+// Generate or retrieve unique user ID for this browser
+const getUserId = () => {
+  const STORAGE_KEY = 'finmate_user_id';
+  let userId = localStorage.getItem(STORAGE_KEY);
+  
+  if (!userId) {
+    // Generate a unique ID: timestamp + random string
+    userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    localStorage.setItem(STORAGE_KEY, userId);
+    console.log('[FinMate] New user ID generated:', userId);
+  }
+  
+  return userId;
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -24,6 +39,19 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Request interceptor to add userId to every request
+api.interceptors.request.use(
+  (config) => {
+    const userId = getUserId();
+    // Add userId to headers
+    config.headers['X-User-Id'] = userId;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Response interceptor for error handling
 api.interceptors.response.use(
@@ -365,10 +393,16 @@ export const healthCheck = async () => {
   return response.data;
 };
 
+/**
+ * Get the current user ID (for display/debugging)
+ */
+export { getUserId };
+
 // Default export for convenience
 export default {
   chat: chatAPI,
   transactions: transactionsAPI,
   analysis: analysisAPI,
-  healthCheck
+  healthCheck,
+  getUserId
 };

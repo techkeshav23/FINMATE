@@ -12,20 +12,51 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir);
 }
 
-// Initialize LocalStorage in the data folder
-const localStorage = new LocalStorage(path.join(dataDir, 'storage'));
+// User-specific storage instances cache
+const userStorageCache = {};
+
+// Get or create user-specific localStorage instance
+const getUserStorage = (userId) => {
+  if (!userId) {
+    // Fallback to default storage (for backward compatibility)
+    userId = 'default';
+  }
+  
+  if (!userStorageCache[userId]) {
+    const userDataDir = path.join(dataDir, 'users', userId);
+    if (!fs.existsSync(userDataDir)) {
+      fs.mkdirSync(userDataDir, { recursive: true });
+    }
+    userStorageCache[userId] = new LocalStorage(userDataDir);
+  }
+  
+  return userStorageCache[userId];
+};
+
+// Current user context (set per request via middleware)
+let currentUserId = null;
 
 // DB Wrapper to mimic SQL-like operations with simpler JSON
 const db = {
-  // Helper to get collection
+  // Set current user for this request
+  setCurrentUser: (userId) => {
+    currentUserId = userId;
+  },
+
+  // Get current user ID
+  getCurrentUser: () => currentUserId,
+
+  // Helper to get collection (now user-scoped)
   getCollection: (name) => {
-    const data = localStorage.getItem(name);
+    const storage = getUserStorage(currentUserId);
+    const data = storage.getItem(name);
     return data ? JSON.parse(data) : [];
   },
 
-  // Helper to save collection
+  // Helper to save collection (now user-scoped)
   saveCollection: (name, data) => {
-    localStorage.setItem(name, JSON.stringify(data));
+    const storage = getUserStorage(currentUserId);
+    storage.setItem(name, JSON.stringify(data));
   },
 
   // --- Transaction Methods ---
