@@ -862,6 +862,45 @@ class LLMService {
         }
         break;
         
+      case 'MONTHLY_ANALYSIS':
+        // BAR CHART for month-by-month performance
+        const monthlyData = db.getMonthlyData();
+        if (monthlyData && monthlyData.length > 0) {
+          const bestMonth = monthlyData.reduce((max, m) => (m.profit > max.profit) ? m : max, monthlyData[0]);
+          const worstMonth = monthlyData.reduce((min, m) => (m.profit < min.profit) ? m : min, monthlyData[0]);
+          const totalProfit = monthlyData.reduce((sum, m) => sum + m.profit, 0);
+          const avgProfit = Math.round(totalProfit / monthlyData.length);
+          
+          const recommendation = bestMonth.month === worstMonth.month 
+            ? `💡Only one month of data. Keep tracking to see trends over time.`
+            : `💡Best: ${bestMonth.month} (₹${bestMonth.profit.toLocaleString()} profit). Worst: ${worstMonth.month}. Analyze what made ${bestMonth.month} successful.`;
+          
+          charts.push({
+            component: "Card",
+            props: {
+              children: [
+                { component: "InlineHeader", props: { heading: "Monthly Performance", description: `${monthlyData.length} months analyzed | Avg monthly profit: ₹${avgProfit.toLocaleString()}` } },
+                { component: "MiniCardBlock", props: { children: [
+                  { component: "MiniCard", props: { lhs: { component: "DataTile", props: { amount: `₹${bestMonth.profit.toLocaleString()}`, description: `Best (${bestMonth.month})`, child: { component: "Icon", props: { name: "trending-up", category: "arrows" } } } } } },
+                  { component: "MiniCard", props: { lhs: { component: "DataTile", props: { amount: `₹${worstMonth.profit.toLocaleString()}`, description: `Lowest (${worstMonth.month})`, child: { component: "Icon", props: { name: "trending-down", category: "arrows" } } } } } }
+                ] } },
+                { component: "BarChartV2", props: { chartData: { header: { component: "InlineHeader", props: { heading: "Monthly Income vs Expenses" } }, data: { labels: monthlyData.map(m => m.month), series: [{ category: "Income", values: monthlyData.map(m => m.income) }, { category: "Expenses", values: monthlyData.map(m => m.expense) }] } } } },
+                { component: "LineChartV2", props: { chartData: { header: { component: "InlineHeader", props: { heading: "Profit Trend Over Time" } }, data: { labels: monthlyData.map(m => m.month), series: [{ category: "Net Profit", values: monthlyData.map(m => m.profit) }] } } } },
+                { component: "CalloutV2", props: { variant: "info", title: "What To Do", description: recommendation } }
+              ]
+            }
+          });
+        } else {
+          charts.push({
+            component: "Card",
+            props: { children: [
+              { component: "InlineHeader", props: { heading: "Monthly Analysis", description: "Not enough data for monthly breakdown" } },
+              { component: "CalloutV2", props: { variant: "warning", title: "Need More Data", description: "💡Upload more transactions to see monthly performance trends." } }
+            ] }
+          });
+        }
+        break;
+        
       case 'SUMMARY':
       default:
         // DASHBOARD: Metrics + Pie + Recommendation
@@ -906,22 +945,29 @@ class LLMService {
       return 'TRANSACTION_LIST';
     }
     
-    // EXPENSE/BREAKDOWN queries
-    if (query.includes('expense') || query.includes('spending') || query.includes('breakdown') || 
-        query.includes('category') || query.includes('where') && query.includes('money')) {
-      return 'EXPENSE_BREAKDOWN';
+    // TREND/TIMELINE queries - user wants to see data over time (LINE CHART)
+    if (query.includes('trend') || query.includes('daily') || query.includes('7 day') || 
+        query.includes('pattern') || query.includes('over time') || query.includes('history') ||
+        query.includes('timeline') || query.includes('time line') || query.includes('progress')) {
+      return 'TREND_ANALYSIS';
     }
     
-    // TREND queries
-    if (query.includes('trend') || query.includes('daily') || query.includes('7 day') || 
-        query.includes('pattern') || query.includes('over time') || query.includes('history')) {
-      return 'TREND_ANALYSIS';
+    // MONTHLY/PERIOD COMPARISON queries (BAR CHART with months)
+    if (query.includes('monthly') || query.includes('month') && (query.includes('performance') || query.includes('compare') || query.includes('analysis')) ||
+        query.includes('each month') || query.includes('month by month') || query.includes('month wise')) {
+      return 'MONTHLY_ANALYSIS';
     }
     
     // COMPARISON queries
     if (query.includes('compare') || query.includes('vs') || query.includes('versus') || 
         query.includes('last week') || query.includes('this week') || query.includes('change')) {
       return 'COMPARISON';
+    }
+    
+    // EXPENSE/BREAKDOWN queries
+    if (query.includes('expense') || query.includes('spending') || query.includes('breakdown') || 
+        query.includes('category') || query.includes('where') && query.includes('money')) {
+      return 'EXPENSE_BREAKDOWN';
     }
     
     // PROFIT queries

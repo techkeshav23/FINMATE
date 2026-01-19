@@ -313,6 +313,35 @@ const db = {
     return breakdown
       .sort((a, b) => b.value - a.value)
       .slice(0, limit);
+  },
+
+  // Get monthly aggregated data for monthly performance charts
+  getMonthlyData: () => {
+    const txns = db.getCollection('transactions');
+    const monthlyData = {};
+    
+    txns.forEach(t => {
+      const date = new Date(t.date);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      
+      if (!monthlyData[monthKey]) {
+        monthlyData[monthKey] = { month: monthName, monthKey, income: 0, expense: 0, count: 0 };
+      }
+      
+      const amt = parseFloat(t.amount) || 0;
+      if (t.type === 'credit') monthlyData[monthKey].income += amt;
+      if (t.type === 'debit') monthlyData[monthKey].expense += amt;
+      monthlyData[monthKey].count++;
+    });
+    
+    // Sort by monthKey and return
+    return Object.values(monthlyData)
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+      .map(m => ({
+        ...m,
+        profit: m.income - m.expense
+      }));
   }
 };
 
