@@ -348,16 +348,42 @@ const db = {
   },
 
   // Timeline data for line charts (daily spending trend)
-  getTimelineData: (days = 7) => {
+  // Can filter by month name or get last N days
+  getTimelineData: (days = 7, monthFilter = null) => {
     const txns = db.getCollection('transactions');
     const now = new Date();
     const timeline = {};
     
-    // Initialize timeline with zeros for last N days
-    for (let i = days - 1; i >= 0; i--) {
-      const date = new Date(now - i * 24 * 60 * 60 * 1000);
-      const dateKey = date.toISOString().split('T')[0];
-      timeline[dateKey] = { date: dateKey, income: 0, expense: 0, count: 0 };
+    if (monthFilter) {
+      // Get data for specific month
+      const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+                          'july', 'august', 'september', 'october', 'november', 'december'];
+      const monthIndex = monthNames.indexOf(monthFilter.toLowerCase());
+      
+      if (monthIndex !== -1) {
+        // Determine year - if month is in future, use last year
+        let year = now.getFullYear();
+        if (monthIndex > now.getMonth()) {
+          year = year - 1;
+        }
+        
+        // Get days in this month
+        const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+        
+        // Initialize timeline for this month
+        for (let day = 1; day <= daysInMonth; day++) {
+          const date = new Date(year, monthIndex, day);
+          const dateKey = date.toISOString().split('T')[0];
+          timeline[dateKey] = { date: dateKey, income: 0, expense: 0, count: 0 };
+        }
+      }
+    } else {
+      // Default: Initialize timeline with zeros for last N days
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date(now - i * 24 * 60 * 60 * 1000);
+        const dateKey = date.toISOString().split('T')[0];
+        timeline[dateKey] = { date: dateKey, income: 0, expense: 0, count: 0 };
+      }
     }
     
     // Populate with actual data

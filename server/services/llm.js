@@ -114,12 +114,16 @@ class LLMService {
 
     // Smart date range detection for timeline data
     let timelineDays = 7; // Default: 7 days
+    let monthFilter = null; // For specific month queries
     const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
                         'july', 'august', 'september', 'october', 'november', 'december'];
     const monthMatch = monthNames.find(m => lowerMsg.includes(m));
     
-    if (monthMatch || lowerMsg.includes('month') || lowerMsg.includes('monthly')) {
-      timelineDays = 31; // Full month
+    if (monthMatch) {
+      monthFilter = monthMatch; // Pass specific month to filter
+      timelineDays = 31;
+    } else if (lowerMsg.includes('month') || lowerMsg.includes('monthly')) {
+      timelineDays = 31; // Full month (current)
     } else if (lowerMsg.includes('week') || lowerMsg.includes('weekly')) {
       timelineDays = 7;
     } else if (lowerMsg.includes('year') || lowerMsg.includes('yearly') || lowerMsg.includes('annual')) {
@@ -128,8 +132,8 @@ class LLMService {
       timelineDays = 90;
     }
 
-    // Get timeline data for trend charts
-    const timelineData = db.getTimelineData(timelineDays);
+    // Get timeline data for trend charts (with optional month filter)
+    const timelineData = db.getTimelineData(timelineDays, monthFilter);
 
     const dataContext = `
       GLOBAL STATS:
