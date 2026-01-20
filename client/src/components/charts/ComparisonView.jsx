@@ -25,7 +25,7 @@ const ComparisonView = ({ data }) => {
   
   if (!data || !data.comparison) return null;
   
-  const { period1, period2, comparison } = data;
+  const { period1, period2, comparison, unit = '₹' } = data; // Default unit to ₹ if not provided in data
   
   // Calculate totals
   const total1 = comparison.reduce((sum, c) => sum + c.amount1, 0);
@@ -90,13 +90,13 @@ const ComparisonView = ({ data }) => {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-blue-500" />
             <span className="text-gray-600">{period1.label}</span>
-            <span className="text-gray-900 font-medium">₹{total1.toLocaleString()}</span>
+            <span className="text-gray-900 font-medium">{unit}{total1.toLocaleString()}</span>
           </div>
           <span className="text-gray-600">vs</span>
           <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-primary-500" />
             <span className="text-gray-600">{period2.label}</span>
-            <span className="text-gray-900 font-medium">₹{total2.toLocaleString()}</span>
+            <span className="text-gray-900 font-medium">{unit}{total2.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@ const ComparisonView = ({ data }) => {
           <div className="flex items-center gap-1.5 sm:gap-2">
             {getTrendIcon(totalChange)}
             <span className={`text-xs sm:text-base font-semibold ${getTrendColor(parseFloat(totalChangePercent))}`}>
-              {totalChange > 0 ? '+' : ''}₹{totalChange.toLocaleString()} ({totalChangePercent}%)
+              {totalChange > 0 ? '+' : ''}{unit}{Math.abs(totalChange).toLocaleString()} ({totalChangePercent}%)
             </span>
           </div>
         </div>
@@ -133,7 +133,7 @@ const ComparisonView = ({ data }) => {
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fill: '#94a3b8', fontSize: 11 }}
-                tickFormatter={(v) => `₹${(v/1000).toFixed(0)}k`}
+                tickFormatter={(v) => `${unit}${(v/1000).toFixed(0)}k`}
               />
               <Tooltip 
                 contentStyle={{
@@ -142,7 +142,7 @@ const ComparisonView = ({ data }) => {
                   borderRadius: '8px',
                   color: '#1f2937'
                 }}
-                formatter={(value) => [`₹${value.toLocaleString()}`, '']}
+                formatter={(value) => [`${unit}${value.toLocaleString()}`, '']}
               />
               <Bar dataKey={period1.label} fill="#3b82f6" radius={[4, 4, 0, 0]} />
               <Bar dataKey={period2.label} fill="#22c55e" radius={[4, 4, 0, 0]} />

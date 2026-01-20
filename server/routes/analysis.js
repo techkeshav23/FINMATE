@@ -15,13 +15,24 @@ router.get('/summary', (req, res) => {
 
 // GET /api/analysis/trends
 router.get('/trends', (req, res) => {
-    // Return mock trend data for charts
-    const data = [
-        { name: 'Week 1', income: 4000, expense: 2400 },
-        { name: 'Week 2', income: 3000, expense: 1398 },
-        { name: 'Week 3', income: 2000, expense: 9800 },
-        { name: 'Week 4', income: 2780, expense: 3908 },
-    ];
+    // Return REAL monthly trend data (Fix: Removed mock data)
+    const monthlyData = db.getMonthlyData();
+    
+    // Format to match chart expectation (name = label)
+    const data = monthlyData.map(m => ({
+        name: m.month,
+        income: Math.round(m.income),
+        expense: Math.round(m.expense),
+        profit: Math.round(m.profit)
+    }));
+
+    // If no data, return empty array (or minimal placeholder if needed by frontend)
+    if (data.length === 0) {
+        return res.json([
+            { name: 'No Data', income: 0, expense: 0 }
+        ]);
+    }
+
     res.json(data);
 });
 

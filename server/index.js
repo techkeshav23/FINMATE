@@ -24,21 +24,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // For serving uploaded files if needed
 
 // User identification middleware - extracts userId from header or query
-app.use((req, res, next) => {
-  // Get userId from header (preferred) or query param
-  const userId = req.headers['x-user-id'] || req.query.userId || null;
-  
-  if (userId) {
-    // Set the current user context for this request
-    db.setCurrentUser(userId);
-    console.log(`[User] Request from user: ${userId.substring(0, 12)}...`);
-  } else {
-    // Default user for backward compatibility
-    db.setCurrentUser('default');
-  }
-  
-  next();
-});
+app.use(db.userMiddleware);
 
 // Routes
 app.use('/api/chat', chatRoutes);

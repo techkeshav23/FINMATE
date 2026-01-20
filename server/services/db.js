@@ -2,6 +2,7 @@ import { LocalStorage } from 'node-localstorage';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { AsyncLocalStorage } from 'async_hooks';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,6 +15,7 @@ if (!fs.existsSync(dataDir)) {
 
 // User-specific storage instances cache
 const userStorageCache = {};
+const userContext = new AsyncLocalStorage();
 
 // Get or create user-specific localStorage instance
 const getUserStorage = (userId) => {
@@ -33,28 +35,45 @@ const getUserStorage = (userId) => {
   return userStorageCache[userId];
 };
 
-// Current user context (set per request via middleware)
-let currentUserId = null;
-
 // DB Wrapper to mimic SQL-like operations with simpler JSON
 const db = {
-  // Set current user for this request
-  setCurrentUser: (userId) => {
-    currentUserId = userId;
+  // Middleware to handle user context per request (fixes concurrency)
+  userMiddleware: (req, res, next) => {
+    // Get userId from header (preferred) or query param
+    const userId = req.headers['x-user-id'] || req.query.userId || 'default';
+    
+    // Run the rest of the request within the user context
+    userContext.run(userId, () => {
+        // Log inside the context so it's accurate
+        if (userId !== 'default') {
+             console.log(`[User] Request from user: ${userId.substring(0, 12)}...`);
+        }
+        next();
+    });
   },
 
-  // Get current user ID
-  getCurrentUser: () => currentUserId,
+  // Get current user ID from AsyncContext
+  getCurrentUser: () => {
+    return userContext.getStore() || 'default'; 
+  },
+
 
   // Helper to get collection (now user-scoped)
   getCollection: (name) => {
-    const storage = getUserStorage(currentUserId);
-    const data = storage.getItem(name);
-    return data ? JSON.parse(data) : [];
+    try {
+      const currentUserId = db.getCurrentUser();
+      const storage = getUserStorage(currentUserId);
+      const data = storage.getItem(name);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      console.error(`Error reading collection ${name}:`, e);
+      return [];
+    }
   },
 
   // Helper to save collection (now user-scoped)
   saveCollection: (name, data) => {
+    const currentUserId = db.getCurrentUser();
     const storage = getUserStorage(currentUserId);
     storage.setItem(name, JSON.stringify(data));
   },
@@ -68,16 +87,25 @@ const db = {
     txns.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // Simple Filtering
-    if (filters.limit) txns = txns.slice(0, filters.limit);
+    // Fix: Filter BEFORE slicing, otherwise search/type filters might return empty results
+    // if the matching transactions are older than the limit.
+    
     // Keyword search simulation for RAG
     if (filters.search) {
         const lowerSearch = filters.search.toLowerCase();
         txns = txns.filter(t => 
             (t.description && t.description.toLowerCase().includes(lowerSearch)) || 
-            (t.category && t.category.toLowerCase().includes(lowerSearch)) ||
-            (filters.type && t.type === filters.type)
+            (t.category && t.category.toLowerCase().includes(lowerSearch))
         );
     }
+    
+    // Type Filtering
+    if (filters.type) {
+        txns = txns.filter(t => t.type === filters.type);
+    }
+
+    // Apply Limit LAST
+    if (filters.limit) txns = txns.slice(0, filters.limit);
 
     return txns;
   },

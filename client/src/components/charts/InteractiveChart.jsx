@@ -28,6 +28,13 @@ const CustomTooltip = ({ children }) => (
   </div>
 );
 
+// Helper for formatting values with units
+const formatValue = (val, unit = '₹') => {
+  if (val === undefined || val === null) return '';
+  // Check if unit is actually needed (e.g., if val is a count)
+  return `${unit}${val.toLocaleString()}`; 
+};
+
 /**
  * InteractiveBarChart - Bar chart with drill-down capability
  * 
@@ -35,8 +42,9 @@ const CustomTooltip = ({ children }) => (
  * @param {string} title - Chart title
  * @param {Function} onDrillDown - Callback when bar is clicked
  * @param {Array} series - Optional: Array of keys for multiple series
+ * @param {string} unit - Optional: Unit prefix (default: ₹)
  */
-export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
+export const InteractiveBarChart = ({ data, title, onDrillDown, series, unit = '₹' }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
   const [selectedBar, setSelectedBar] = useState(null);
 
@@ -91,7 +99,7 @@ export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#94a3b8', fontSize: 10 }}
-              tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
+              tickFormatter={(value) => `${unit}${(value/1000).toFixed(0)}k`}
               width={45}
             />
             <Tooltip 
@@ -109,7 +117,7 @@ export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
                     <p className="text-gray-900 font-medium">{item.name}</p>
                     {payload.map((p, idx) => (
                       <p key={idx} className="text-sm font-semibold" style={{ color: p.color }}>
-                        {p.name}: ₹{p.value?.toLocaleString()}
+                        {p.name}: {formatValue(p.value, unit)}
                       </p>
                     ))}
                     {item.percentage && (
@@ -170,7 +178,7 @@ export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
 
       <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-gray-200 flex items-center justify-between">
         <span className="text-gray-500 text-[10px] sm:text-sm">Total</span>
-        <span className="text-gray-900 font-semibold text-xs sm:text-base">₹{total?.toLocaleString()}</span>
+        <span className="text-gray-900 font-semibold text-xs sm:text-base">{formatValue(total, unit)}</span>
       </div>
     </div>
   );
@@ -182,8 +190,9 @@ export const InteractiveBarChart = ({ data, title, onDrillDown, series }) => {
  * @param {Object} data - Chart data with { data: [], total: number }
  * @param {string} title - Chart title
  * @param {Function} onDrillDown - Callback when segment is clicked
+ * @param {string} unit - Optional: Unit prefix (default: ₹)
  */
-export const InteractivePieChart = ({ data, title, onDrillDown }) => {
+export const InteractivePieChart = ({ data, title, onDrillDown, unit = '₹' }) => {
   const [activeIndex, setActiveIndex] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -251,7 +260,7 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
                 return (
                   <CustomTooltip>
                     <p className="text-gray-900 font-medium">{item.category}</p>
-                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    <p className="text-primary-600 text-lg">{formatValue(item.amount, unit)}</p>
                     <p className="text-gray-500 text-xs">{item.percentage}% of spending</p>
                     <div className="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1 text-xs text-amber-400">
                       <ZoomIn className="w-3 h-3" />
@@ -299,8 +308,9 @@ export const InteractivePieChart = ({ data, title, onDrillDown }) => {
  * @param {Object} data - Chart data with { data: [], total: number }
  * @param {string} title - Chart title
  * @param {Function} onDrillDown - Callback when point is clicked
+ * @param {string} unit - Optional: Unit prefix (default: ₹)
  */
-export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
+export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹' }) => {
   const [selectedPoint, setSelectedPoint] = useState(null);
 
   // Normalize data
@@ -342,7 +352,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#94a3b8', fontSize: 10 }}
-              tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
+              tickFormatter={(value) => `${unit}${(value/1000).toFixed(0)}k`}
               width={45}
             />
             <Tooltip 
@@ -359,7 +369,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown }) => {
                     <p className="text-gray-900 font-medium">
                       {new Date(item.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
-                    <p className="text-primary-600 text-lg">₹{item.amount?.toLocaleString()}</p>
+                    <p className="text-primary-600 text-lg">{formatValue(item.amount, unit)}</p>
                     {item.count && (
                       <p className="text-gray-500 text-xs">{item.count} transactions</p>
                     )}

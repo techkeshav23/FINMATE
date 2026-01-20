@@ -262,9 +262,10 @@ FinMate/
 │   │   │   │   ├── ClarificationOptions.jsx
 │   │   │   │   ├── ConfidenceBadge.jsx
 │   │   │   │   └── ReasoningSteps.jsx
-│   │   │   ├── 💬 ChatWindow.jsx   # Main chat interface
+│   │   │   ├── 💬 ChatWindow.jsx       # Main chat interface
 │   │   │   ├── 💭 MessageBubble.jsx
-│   │   │   └── 🎨 ThesysGenUI.jsx  # Generative UI Renderer ⭐
+│   │   │   ├── 🎨 ThesysGenUI.jsx      # Generative UI Renderer ⭐
+│   │   │   └── ⚙️ ComponentRegistry.jsx # Dynamic component mapping
 │   │   ├── services/
 │   │   │   └── api.js              # API client
 │   │   └── App.jsx
@@ -277,7 +278,9 @@ FinMate/
 │   │   └── analysis.js             # Analytics
 │   ├── services/
 │   │   ├── 🤖 llm.js               # Thesys CI integration ⭐
+│   │   ├── 📝 prompts.js           # System prompts & persona
 │   │   └── 💾 db.js                # Database layer
+│   ├── utils/                      # Helper functions
 │   ├── data/storage/               # Persisted data
 │   └── package.json
 │

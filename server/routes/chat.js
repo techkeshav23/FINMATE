@@ -47,110 +47,115 @@ router.get('/history', (req, res) => {
 });
 
 // POST /api/chat - Send message (with session support)
-router.post('/', async (req, res) => {
-  const { message, context, sessionId } = req.body;
-  const lowerMsg = message.toLowerCase();
-  
-  // Get or create session
-  let currentSessionId = sessionId;
-  if (!currentSessionId) {
-    const sessions = db.getSessions();
-    if (sessions.length === 0) {
-      const newSession = db.createSession('New Chat');
-      currentSessionId = newSession.id;
-    } else {
-      currentSessionId = sessions[0].id;
+router.post('/', async (req, res, next) => {
+  try {
+    const { message, context, sessionId } = req.body;
+    const lowerMsg = message.toLowerCase();
+    
+    // Get or create session
+    let currentSessionId = sessionId;
+    if (!currentSessionId) {
+      const sessions = db.getSessions();
+      if (sessions.length === 0) {
+        const newSession = db.createSession('New Chat');
+        currentSessionId = newSession.id;
+      } else {
+        currentSessionId = sessions[0].id;
+      }
     }
-  }
-  
-  // 1. Save User Message to session
-  db.addMessageToSession(currentSessionId, { role: 'user', content: message });
+    
+    // 1. Save User Message to session
+    db.addMessageToSession(currentSessionId, { role: 'user', content: message });
 
-  // Fix #2: Detect simulation/what-if queries and handle locally for faster response
-  const isSimulationQuery = lowerMsg.includes('what if') || 
-                            lowerMsg.includes('simulate') || 
-                            lowerMsg.includes('if sales drop') ||
-                            lowerMsg.includes('if i reduce') ||
-                            lowerMsg.includes('scenario');
-  
-  let aiResponse;
-  
-  if (isSimulationQuery) {
-    // Handle simulation queries directly
-    const stats = db.getStats();
-    const baseline = stats.total_income || 5000;
+    // Fix #2: Detect simulation/what-if queries and handle locally for faster response
+    const isSimulationQuery = lowerMsg.includes('what if') || 
+                              lowerMsg.includes('simulate') || 
+                              lowerMsg.includes('if sales drop') ||
+                              lowerMsg.includes('if i reduce') ||
+                              lowerMsg.includes('scenario');
     
-    // Parse percentage from query
-    let percent = 10; // default
-    const percentMatch = message.match(/(\d+)%/);
-    if (percentMatch) percent = parseInt(percentMatch[1]);
+    let aiResponse;
     
-    const isDecrease = lowerMsg.includes('drop') || lowerMsg.includes('reduce') || lowerMsg.includes('down') || lowerMsg.includes('less');
-    const multiplier = isDecrease ? (1 - percent/100) : (1 + percent/100);
-    const simulated = Math.round(baseline * multiplier);
-    const impact = simulated - baseline;
-    
-    aiResponse = {
-      reasoning: ["Detected simulation query", `Applied ${percent}% ${isDecrease ? 'decrease' : 'increase'}`, "Generated comparison"],
-      response: `Here's what happens if your sales ${isDecrease ? 'drop' : 'increase'} by ${percent}%:`,
-      components: [
-        {
-          type: "grid",
-          children: [
-            {
-              type: "metric_card",
-              props: { label: "Current Sales", value: `₹${baseline.toLocaleString()}`, trend: "neutral", icon: "rupee" }
-            },
-            {
-              type: "metric_card", 
-              props: { label: "Simulated", value: `₹${simulated.toLocaleString()}`, trend: isDecrease ? "down" : "up", icon: "trending-" + (isDecrease ? "down" : "up") }
-            }
-          ]
-        },
-        {
-          type: "bar_chart",
-          data: {
-            title: `Impact: ${isDecrease ? '-' : '+'}₹${Math.abs(impact).toLocaleString()}`,
-            data: [
-              { name: "Current", amount: baseline },
-              { name: "Simulated", amount: simulated }
+    if (isSimulationQuery) {
+      // Handle simulation queries directly
+      const stats = db.getStats();
+      const baseline = stats.total_income || 5000;
+      
+      // Parse percentage from query
+      let percent = 10; // default
+      const percentMatch = message.match(/(\d+)%/);
+      if (percentMatch) percent = parseInt(percentMatch[1]);
+      
+      const isDecrease = lowerMsg.includes('drop') || lowerMsg.includes('reduce') || lowerMsg.includes('down') || lowerMsg.includes('less');
+      const multiplier = isDecrease ? (1 - percent/100) : (1 + percent/100);
+      const simulated = Math.round(baseline * multiplier);
+      const impact = simulated - baseline;
+      
+      aiResponse = {
+        reasoning: ["Detected simulation query", `Applied ${percent}% ${isDecrease ? 'decrease' : 'increase'}`, "Generated comparison"],
+        response: `Here's what happens if your sales ${isDecrease ? 'drop' : 'increase'} by ${percent}%:`,
+        components: [
+          {
+            type: "grid",
+            children: [
+              {
+                type: "metric_card",
+                props: { label: "Current Sales", value: `₹${baseline.toLocaleString()}`, trend: "neutral", icon: "rupee" }
+              },
+              {
+                type: "metric_card", 
+                props: { label: "Simulated", value: `₹${simulated.toLocaleString()}`, trend: isDecrease ? "down" : "up", icon: "trending-" + (isDecrease ? "down" : "up") }
+              }
             ]
+          },
+          {
+            type: "bar_chart",
+            data: {
+              title: `Impact: ${isDecrease ? '-' : '+'}₹${Math.abs(impact).toLocaleString()}`,
+              data: [
+                { name: "Current", amount: baseline },
+                { name: "Simulated", amount: simulated }
+              ]
+            }
+          },
+          {
+            type: "simulation",
+            props: {
+              label: "Adjust Sales Change",
+              min: -50,
+              max: 50,
+              defaultValue: isDecrease ? -percent : percent,
+              unit: "%"
+            }
           }
-        },
-        {
-          type: "simulation",
-          props: {
-            label: "Adjust Sales Change",
-            min: -50,
-            max: 50,
-            defaultValue: isDecrease ? -percent : percent,
-            unit: "%"
-          }
-        }
-      ],
-      confidence: "high",
-      suggestions: ["What if expenses increase 15%?", "Show current profit margin", "Compare with last month"]
+        ],
+        confidence: "high",
+        suggestions: ["What if expenses increase 15%?", "Show current profit margin", "Compare with last month"]
+      };
+    } else {
+      // 2. Get AI Response for non-simulation queries
+      aiResponse = await llmService.processQuery(message, { history: [] });
+    }
+    
+    // 3. Save AI Response
+    const aiMsg = {
+      role: 'assistant',
+      content: aiResponse.response,
+      components: aiResponse.components,
+      confidence: aiResponse.confidence,
+      reasoning: aiResponse.reasoning,
+      suggestions: aiResponse.suggestions,
+      timestamp: new Date().toISOString()
     };
-  } else {
-    // 2. Get AI Response for non-simulation queries
-    aiResponse = await llmService.processQuery(message, { history: [] });
-  }
-  
-  // 3. Save AI Response
-  const aiMsg = {
-    role: 'assistant',
-    content: aiResponse.response,
-    components: aiResponse.components,
-    confidence: aiResponse.confidence,
-    reasoning: aiResponse.reasoning,
-    suggestions: aiResponse.suggestions,
-    timestamp: new Date().toISOString()
-  };
-  
-  // Save to session
-  db.addMessageToSession(currentSessionId, aiMsg);
+    
+    // Save to session
+    db.addMessageToSession(currentSessionId, aiMsg);
 
-  res.json({ ...aiMsg, sessionId: currentSessionId });
+    res.json({ ...aiMsg, sessionId: currentSessionId });
+  } catch (error) {
+    console.error('Error in chat route:', error);
+    next(error);
+  }
 });
 
 // POST /api/chat/new - Create new chat session

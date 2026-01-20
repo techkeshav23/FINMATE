@@ -12,7 +12,7 @@ import {
  * - "Spots unusual patterns"
  * - "Timeline for changes"
  */
-const ChangeDetection = ({ changes, onExplore }) => {
+const ChangeDetection = ({ changes, onExplore, unit = '₹' }) => {
   if (!changes || changes.length === 0) return null;
 
   const getChangeIcon = (type, direction) => {
@@ -62,13 +62,13 @@ const ChangeDetection = ({ changes, onExplore }) => {
                   <div className="flex items-center gap-2 sm:gap-4 mt-1.5 sm:mt-2 flex-wrap">
                     <div className="text-[10px] sm:text-xs">
                       <span className="text-gray-500">Before: </span>
-                      <span className="text-gray-700">₹{change.stats.before?.toLocaleString()}</span>
+                      <span className="text-gray-700">{unit}{change.stats.before?.toLocaleString()}</span>
                     </div>
                     <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-gray-600" />
                     <div className="text-[10px] sm:text-xs">
                       <span className="text-gray-500">Now: </span>
                       <span className={change.direction === 'up' ? 'text-red-400' : 'text-primary-600'}>
-                        ₹{change.stats.after?.toLocaleString()}
+                        {unit}{change.stats.after?.toLocaleString()}
                       </span>
                     </div>
                     <div className={`text-[10px] sm:text-xs font-medium ${

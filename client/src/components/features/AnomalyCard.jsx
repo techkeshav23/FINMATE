@@ -13,7 +13,7 @@ import {
  * - "Flags risks or concerns"
  * - "Explains its patterns, anomalies, and conclusions"
  */
-const AnomalyCard = ({ data }) => {
+const AnomalyCard = ({ data, unit = '₹' }) => {
   const [expanded, setExpanded] = useState(true);
   const [dismissedIds, setDismissedIds] = useState([]);
 
@@ -94,12 +94,12 @@ const AnomalyCard = ({ data }) => {
                     <div className="flex items-center gap-2 sm:gap-4 mt-1.5 sm:mt-2 flex-wrap">
                       <div className="text-[10px] sm:text-xs">
                         <span className="text-gray-500">Expected: </span>
-                        <span className="text-gray-700">₹{anomaly.stats.expected?.toLocaleString()}</span>
+                        <span className="text-gray-700">{unit}{anomaly.stats.expected?.toLocaleString()}</span>
                       </div>
                       <div className="text-[10px] sm:text-xs">
                         <span className="text-gray-500">Actual: </span>
                         <span className={anomaly.stats.actual > anomaly.stats.expected ? 'text-red-400' : 'text-primary-600'}>
-                          ₹{anomaly.stats.actual?.toLocaleString()}
+                          {unit}{anomaly.stats.actual?.toLocaleString()}
                         </span>
                       </div>
                       <div className="text-[10px] sm:text-xs">

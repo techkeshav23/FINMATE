@@ -14,7 +14,7 @@ import {
  * - "Adapts its UI as the conversation evolves"
  * - "Creative use of Thesys CI to generate evolving, interactive UI"
  */
-const SimulationSlider = ({ data, onSimulate }) => {
+const SimulationSlider = ({ data, onSimulate, unit = '₹' }) => {
   const categories = useMemo(() => data?.categories || [], [data?.categories]);
   const originalBudget = useMemo(() => data?.originalBudget || 0, [data?.originalBudget]);
   const goalAmount = useMemo(() => data?.goalAmount || originalBudget * 0.8, [data?.goalAmount, originalBudget]);
@@ -103,7 +103,7 @@ const SimulationSlider = ({ data, onSimulate }) => {
           <div className="flex items-center justify-between text-xs sm:text-sm mb-1.5 sm:mb-2">
             <span className="text-gray-600 flex items-center gap-1.5 sm:gap-2">
               <PiggyBank className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              Goal: Save ₹{(originalBudget - goalAmount).toLocaleString()}
+              Goal: Save {unit}{(originalBudget - goalAmount).toLocaleString()}
             </span>
             <span className={`font-medium ${goalProgress >= 100 ? 'text-primary-600' : 'text-amber-400'}`}>
               {Math.min(100, Math.max(0, goalProgress)).toFixed(0)}%
@@ -140,14 +140,14 @@ const SimulationSlider = ({ data, onSimulate }) => {
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <span className="text-[10px] sm:text-xs text-gray-600">
-                    ₹{category.amount.toLocaleString()}
+                    {unit}{category.amount.toLocaleString()}
                   </span>
                   <span className={`text-[10px] sm:text-xs font-medium ${
                     adjustment > 0 ? 'text-red-400' : 
                     adjustment < 0 ? 'text-primary-600' : 
                     'text-gray-500'
                   }`}>
-                    → ₹{Math.round(adjustedAmount).toLocaleString()}
+                    → {unit}{Math.round(adjustedAmount).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -188,7 +188,7 @@ const SimulationSlider = ({ data, onSimulate }) => {
                   {adjustment > 0 ? '+' : ''}{adjustment}%
                   {difference !== 0 && (
                     <span className="ml-1">
-                      ({difference > 0 ? '+' : ''}₹{Math.round(difference).toLocaleString()})
+                      ({difference > 0 ? '+' : ''}{unit}{Math.round(difference).toLocaleString()})
                     </span>
                   )}
                 </span>
@@ -203,12 +203,12 @@ const SimulationSlider = ({ data, onSimulate }) => {
       <div className="p-2.5 sm:p-4 bg-gray-50/50 border-t border-gray-200">
         <div className="grid grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-4">
           <div className="text-center p-2 sm:p-3 bg-white rounded-lg">
-            <p className="text-lg sm:text-2xl font-bold text-gray-900">₹{Math.round(projectedBudget).toLocaleString()}</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900">{unit}{Math.round(projectedBudget).toLocaleString()}</p>
             <p className="text-[10px] sm:text-xs text-gray-600">Projected Spend</p>
           </div>
           <div className="text-center p-2 sm:p-3 bg-white rounded-lg">
             <p className={`text-lg sm:text-2xl font-bold ${savings >= 0 ? 'text-primary-600' : 'text-red-400'}`}>
-              {savings >= 0 ? '+' : ''}₹{Math.round(savings).toLocaleString()}
+              {savings >= 0 ? '+' : ''}{unit}{Math.round(savings).toLocaleString()}
             </p>
             <p className="text-[10px] sm:text-xs text-gray-600">
               {savings >= 0 ? 'Potential Savings' : 'Over Budget'}
