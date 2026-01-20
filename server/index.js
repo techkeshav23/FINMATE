@@ -26,6 +26,23 @@ app.use(express.static(path.join(__dirname, 'public'))); // For serving uploaded
 // User identification middleware - extracts userId from header or query
 app.use(db.userMiddleware);
 
+// Root Route
+app.get('/', (req, res) => {
+  res.json({
+    message: '🪙 FinMate API Server',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      chat: '/api/chat',
+      transactions: '/api/transactions',
+      analysis: '/api/analysis'
+    },
+    documentation: 'See README.md for API documentation',
+    frontend: 'Run client on port 5173 (npm run dev in /client folder)'
+  });
+});
+
 // Routes
 app.use('/api/chat', chatRoutes);
 app.use('/api/transactions', transactionRoutes);
