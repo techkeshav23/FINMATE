@@ -67,6 +67,44 @@ router.post('/upload', upload.single('file'), (req, res) => {
     const sourceFileName = req.file.originalname || 'uploaded.csv';
     const uploadBatchId = uuidv4(); 
 
+    // Helper function to parse various date formats and convert to ISO (YYYY-MM-DD)
+    const parseDate = (dateStr) => {
+      if (!dateStr) return new Date().toISOString().split('T')[0];
+      
+      const str = dateStr.trim();
+      
+      // Check for DD-MM-YYYY or DD/MM/YYYY format (common in India/Europe)
+      const ddmmyyyyMatch = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+      if (ddmmyyyyMatch) {
+        const [, day, month, year] = ddmmyyyyMatch;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      
+      // Check for YYYY-MM-DD format (ISO - already correct)
+      const isoMatch = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+      if (isoMatch) {
+        const [, year, month, day] = isoMatch;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+      
+      // Check for MM-DD-YYYY format (US format)
+      const mmddyyyyMatch = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+      if (mmddyyyyMatch) {
+        // Already handled above as DD-MM-YYYY (we assume DD-MM-YYYY for Indian context)
+        // If you need US format, swap day and month here
+      }
+      
+      // Fallback: try native parsing
+      const parsed = new Date(str);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString().split('T')[0];
+      }
+      
+      // Last resort: return as-is (will be handled downstream)
+      console.warn(`[Upload] Could not parse date: ${str}`);
+      return str;
+    };
+
     const parsedTxns = records.map((record, index) => {
       // Normalize keys (handle case sensitivity)
       const keys = Object.keys(record);
@@ -80,7 +118,7 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
       return {
         id: uuidv4(),
-        date: rDate || new Date().toISOString().split('T')[0],
+        date: parseDate(rDate),
         description: rDesc,
         amount: parseFloat(String(rAmount).replace(/[^0-9.-]+/g, '')), // Remove currency symbols
         type: rType.toLowerCase(),

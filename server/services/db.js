@@ -38,6 +38,31 @@ const getUserStorage = (userId) => {
 // Store current request for fallback when AsyncLocalStorage context is lost
 let currentRequest = null;
 
+// Helper function to parse date strings (handles DD-MM-YYYY, YYYY-MM-DD, etc.)
+const parseTransactionDate = (dateStr) => {
+  if (!dateStr) return new Date();
+  
+  const str = String(dateStr).trim();
+  
+  // Check for DD-MM-YYYY or DD/MM/YYYY format (common in India/Europe)
+  const ddmmyyyyMatch = str.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if (ddmmyyyyMatch) {
+    const [, day, month, year] = ddmmyyyyMatch;
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  }
+  
+  // Check for YYYY-MM-DD format (ISO)
+  const isoMatch = str.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  }
+  
+  // Fallback: try native parsing
+  const parsed = new Date(str);
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
 // DB Wrapper to mimic SQL-like operations with simpler JSON
 const db = {
   // Middleware to handle user context per request (fixes concurrency)
@@ -97,8 +122,8 @@ const db = {
   getTransactions: (filters = {}) => {
     let txns = db.getCollection('transactions');
     
-    // Sort Date DESC
-    txns.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Sort Date DESC (use safe date parser)
+    txns.sort((a, b) => parseTransactionDate(b.date) - parseTransactionDate(a.date));
 
     // Simple Filtering
     // Fix: Filter BEFORE slicing, otherwise search/type filters might return empty results
@@ -297,7 +322,7 @@ const db = {
     const lastWeek = { income: 0, expense: 0 };
     
     txns.forEach(t => {
-      const txnDate = new Date(t.date);
+      const txnDate = parseTransactionDate(t.date);
       const amt = parseFloat(t.amount) || 0;
       
       if (txnDate >= oneWeekAgo) {
@@ -368,7 +393,7 @@ const db = {
     const monthlyData = {};
     
     txns.forEach(t => {
-      const date = new Date(t.date);
+      const date = parseTransactionDate(t.date);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       const monthName = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
       
