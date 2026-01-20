@@ -4,9 +4,21 @@ import { parse } from 'csv-parse/sync';
 import db from '../services/db.js';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+
+// Ensure uploads directory exists (important for production)
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const upload = multer({ dest: uploadsDir });
 
 // GET /api/transactions/stats
 router.get('/stats', (req, res) => {
@@ -30,7 +42,13 @@ router.get('/', (req, res) => {
 
 // POST /api/transactions/upload (CSV)
 router.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  console.log('[Upload] Request received, file:', req.file ? req.file.originalname : 'NO FILE');
+  console.log('[Upload] Content-Type:', req.headers['content-type']);
+  
+  if (!req.file) {
+    console.error('[Upload] No file in request. Body keys:', Object.keys(req.body || {}));
+    return res.status(400).json({ error: 'No file uploaded. Please select a CSV file.' });
+  }
 
   try {
     const fileContent = fs.readFileSync(req.file.path, 'utf8');

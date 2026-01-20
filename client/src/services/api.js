@@ -40,12 +40,18 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to add userId to every request
+// Request interceptor to add userId and handle FormData
 api.interceptors.request.use(
   (config) => {
     const userId = getUserId();
     // Add userId to headers
     config.headers['X-User-Id'] = userId;
+    
+    // Remove Content-Type for FormData - let browser set it with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => {
