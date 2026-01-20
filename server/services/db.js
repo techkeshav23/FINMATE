@@ -228,7 +228,12 @@ const db = {
         if (t.type === 'credit') acc.total_income += amt;
         if (t.type === 'debit') acc.total_expense += amt;
         return acc;
-    }, { total_income: 0, total_expense: 0 });
+    }, { 
+      total_income: 0, 
+      total_expense: 0, 
+      total_transactions: txns.length,
+      last_updated: new Date().toISOString()
+    });
   },
 
   // Fix #5: Category breakdown for pie charts

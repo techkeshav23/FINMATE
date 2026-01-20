@@ -331,7 +331,7 @@ export const transactionsAPI = {
    * Get data statistics
    */
   getStats: async () => {
-    const response = await api.get('/data/stats');
+    const response = await api.get('/transactions/stats');
     return response.data;
   },
 

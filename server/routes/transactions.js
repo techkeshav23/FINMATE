@@ -8,6 +8,12 @@ import fs from 'fs';
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
 
+// GET /api/transactions/stats
+router.get('/stats', (req, res) => {
+  const stats = db.getStats();
+  res.json(stats);
+});
+
 // GET /api/transactions
 router.get('/', (req, res) => {
   const { startDate, endDate, category, search } = req.query;
