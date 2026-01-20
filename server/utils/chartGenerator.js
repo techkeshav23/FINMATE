@@ -107,7 +107,8 @@ export const generateFallbackCharts = (message, categoryBreakdown, timelineData,
              });
         }
 
-        txnChildren.push({ component: "List", props: { children: txnListItems } });
+        // Removed List as per user request (focus on Visuals)
+        // txnChildren.push({ component: "List", props: { children: txnListItems } });
         
         txnChildren.push({ component: "CalloutV2", props: { 
                 variant: "info", 
