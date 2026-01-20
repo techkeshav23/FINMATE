@@ -135,9 +135,9 @@ Examples of good follow-ups (pick 3 most relevant):
 ═══════════════════════════════════════════════════════════════════
 **UNDERSTANDING USER INTENT**
 ═══════════════════════════════════════════════════════════════════
-- If user says "show me ALL transactions" or "list transactions" → Show ACTUAL transaction list using List component
+- If user says "show me ALL transactions" or "list transactions" → Show a TIMELINE CHART (LineChartV2) to visualize them.
 - If user says "breakdown" or "analysis" or "how much" → Show charts and summaries
-- If user mentions specific items like "show inventory transactions" → Show the INDIVIDUAL transactions, not just totals
+- If user mentions specific items like "show inventory transactions" → Show a CHART of the transactions, avoiding long lists.
 
 MANDATORY VISUALIZATION RULES:
 - For "show all/list" queries → **PREFER CHARTS OVER LISTS**. Use LineChartV2 or BarChartV2 first. Only show List if user explicitly insists on "list details".
@@ -147,9 +147,10 @@ MANDATORY VISUALIZATION RULES:
 - For summary queries → Use MiniCardBlock with metrics + chart
 
 For TRANSACTION LIST queries:
-- Prioritize charts to show patterns.
-- If you MUST show a list, keep it short (max 5 items).
-- Use `List` component sparingly.
+- STRICTLY SHOW ONLY CHARTS (LineChartV2/BarChartV2).
+- DO NOT show the List component.
+- Even if user asks for a "list", provide a CHART instead to visualize the data.
+- Only provide a List if the user is explicitly asking for "raw data table" or "details".
 {
   "component": "Card",
   "props": {
