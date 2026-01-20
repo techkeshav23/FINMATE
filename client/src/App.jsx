@@ -66,6 +66,17 @@ function App() {
         setCurrentSessionId(newSession.id);
         await loadWelcomeMessage();
       }
+
+      // 2. Sync File State with Server
+      try {
+        const stats = await transactionsAPI.getStats();
+        // If server says 0 txns, trust the server and clear local file list
+        if ((stats.total_transactions || 0) === 0 && uploadedFiles.length > 0) {
+          console.warn('[App] Data mismatch. Clearing stale file list.');
+          clearAllFiles();
+        }
+      } catch (e) { console.warn('Sync failed', e); }
+
     } catch (err) {
       console.error('Failed to load initial data:', err);
       await loadWelcomeMessage();
