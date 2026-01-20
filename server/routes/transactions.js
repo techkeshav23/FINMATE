@@ -28,29 +28,48 @@ router.post('/upload', upload.single('file'), (req, res) => {
 
   try {
     const fileContent = fs.readFileSync(req.file.path, 'utf8');
+    
+    // Parse with improved options
     const records = parse(fileContent, {
       columns: true,
-      skip_empty_lines: true
+      skip_empty_lines: true,
+      trim: true,
+      bom: true, // Handle Byte Order Mark (Excel CSVs)
+      relax_column_count: true // Be tolerant of trailing commas
     });
 
+    console.log(`[Upload] Parsed ${records.length} records from ${req.file.originalname}`);
+
     const sourceFileName = req.file.originalname || 'uploaded.csv';
-    const uploadBatchId = uuidv4(); // Track this upload batch
+    const uploadBatchId = uuidv4(); 
 
-    const parsedTxns = records.map(record => ({
-      id: uuidv4(),
-      date: record.Date || record.date || new Date().toISOString().split('T')[0],
-      description: record.Description || record.description || 'Unknown',
-      amount: parseFloat(record.Amount || record.amount || 0),
-      type: (record.Type || record.type || 'debit').toLowerCase(),
-      category: record.Category || record.category || 'Uncategorized',
-      source: 'csv',
-      sourceFile: sourceFileName,
-      uploadBatchId: uploadBatchId,
-      uploadedAt: new Date().toISOString(),
-      status: 'settled'
-    }));
+    const parsedTxns = records.map((record, index) => {
+      // Normalize keys (handle case sensitivity)
+      const keys = Object.keys(record);
+      const getVal = (key) => record[keys.find(k => k.toLowerCase() === key.toLowerCase())];
 
-    // Check for duplicates before adding
+      const rDate = getVal('date');
+      const rDesc = getVal('description') || getVal('desc') || 'Unknown';
+      const rAmount = getVal('amount') || getVal('amt') || getVal('value') || 0;
+      const rType = getVal('type') || 'debit';
+      const rCategory = getVal('category') || 'Uncategorized';
+
+      return {
+        id: uuidv4(),
+        date: rDate || new Date().toISOString().split('T')[0],
+        description: rDesc,
+        amount: parseFloat(String(rAmount).replace(/[^0-9.-]+/g, '')), // Remove currency symbols
+        type: rType.toLowerCase(),
+        category: rCategory,
+        source: 'csv',
+        sourceFile: sourceFileName,
+        uploadBatchId: uploadBatchId,
+        uploadedAt: new Date().toISOString(),
+        status: 'settled'
+      };
+    }).filter(t => t.amount !== 0); // Remove 0 amount rows
+
+    // Check for duplicates
     const existingTxns = db.getTransactions();
     const newTxns = parsedTxns.filter(newTxn => {
       return !existingTxns.some(existing => 
