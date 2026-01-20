@@ -16,11 +16,34 @@ class LLMService {
     // 1. SMART RETRIEVAL (RAG-Lite) - ENHANCED
     const lowerMsg = message.toLowerCase();
     
+    // A. MONTH DETECTION FIRST - Support both short (jan) and full (january) names
+    const monthMap = {
+      'jan': 'january', 'january': 'january',
+      'feb': 'february', 'february': 'february',
+      'mar': 'march', 'march': 'march',
+      'apr': 'april', 'april': 'april',
+      'may': 'may',
+      'jun': 'june', 'june': 'june',
+      'jul': 'july', 'july': 'july',
+      'aug': 'august', 'august': 'august',
+      'sep': 'september', 'sept': 'september', 'september': 'september',
+      'oct': 'october', 'october': 'october',
+      'nov': 'november', 'november': 'november',
+      'dec': 'december', 'december': 'december'
+    };
+    const monthMatch = Object.keys(monthMap).find(m => lowerMsg.includes(m));
+    const detectedMonth = monthMatch ? monthMap[monthMatch] : null;
+    
     // Construct Query Filters
     let filters = { limit: 50 };
+    
+    // Add month filter if detected
+    if (detectedMonth) {
+      filters.month = detectedMonth;
+      delete filters.limit; // No limit when filtering by month - show all
+    }
 
-    // A. Detect Financial Intent (Credit vs Debit) 
-    // (We do this first to set the 'type' filter)
+    // B. Detect Financial Intent (Credit vs Debit) 
     if (lowerMsg.includes('sale') || lowerMsg.includes('income') || lowerMsg.includes('revenue') || lowerMsg.includes('credit') || lowerMsg.includes('deposit')) {
         filters.type = 'credit';
     } else if (lowerMsg.includes('expense') || lowerMsg.includes('spend') || lowerMsg.includes('cost') || lowerMsg.includes('debit') || lowerMsg.includes('payment')) {
@@ -112,16 +135,11 @@ class LLMService {
     // Get monthly data for long-term trends
     const monthlyData = db.getMonthlyData();
 
-    // Smart date range detection for timeline data
+    // Smart date range detection for timeline data (reuse detectedMonth from above)
     let timelineDays = 7; // Default: 7 days
-    let monthFilter = null; // For specific month queries
-    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
-                        'july', 'august', 'september', 'october', 'november', 'december'];
-    const monthMatch = monthNames.find(m => lowerMsg.includes(m));
     
-    if (monthMatch) {
-      monthFilter = monthMatch; // Pass specific month to filter
-      timelineDays = 31;
+    if (detectedMonth) {
+      timelineDays = 31; // Full month
     } else if (lowerMsg.includes('month') || lowerMsg.includes('monthly')) {
       timelineDays = 31; // Full month (current)
     } else if (lowerMsg.includes('week') || lowerMsg.includes('weekly')) {
@@ -133,7 +151,12 @@ class LLMService {
     }
 
     // Get timeline data for trend charts (with optional month filter)
-    const timelineData = db.getTimelineData(timelineDays, monthFilter);
+    const timelineData = db.getTimelineData(timelineDays, detectedMonth);
+    
+    // Dynamic timeline label
+    const timelineLabel = detectedMonth 
+      ? `${detectedMonth.charAt(0).toUpperCase() + detectedMonth.slice(1)} daily data` 
+      : `Last ${timelineDays} days`;
 
     const dataContext = `
       GLOBAL STATS:
@@ -153,10 +176,11 @@ class LLMService {
       MONTHLY_PERFORMANCE (last 6 months - use for monthly analysis):
       ${JSON.stringify(monthlyData)}
       
-      DAILY_TIMELINE (last 7 days - use for line_chart):
+      DAILY_TIMELINE (${timelineLabel} - use for LineChartV2):
+      IMPORTANT: Use EXACT dates from this data for chart labels!
       ${JSON.stringify(timelineData)}
       
-      RELEVANT TRANSACTIONS:
+      RELEVANT TRANSACTIONS (${relevantTxns.length} transactions):
       ${JSON.stringify(relevantTxns)}
     `;
 

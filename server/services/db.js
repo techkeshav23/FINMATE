@@ -129,6 +129,27 @@ const db = {
     // Fix: Filter BEFORE slicing, otherwise search/type filters might return empty results
     // if the matching transactions are older than the limit.
     
+    // Month filter - filter by specific month name
+    if (filters.month) {
+      const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+                          'july', 'august', 'september', 'october', 'november', 'december'];
+      const monthIndex = monthNames.indexOf(filters.month.toLowerCase());
+      
+      if (monthIndex !== -1) {
+        const now = new Date();
+        let targetYear = filters.year || now.getFullYear();
+        // If month is in future, use previous year
+        if (!filters.year && monthIndex > now.getMonth()) {
+          targetYear = targetYear - 1;
+        }
+        
+        txns = txns.filter(t => {
+          const txnDate = parseTransactionDate(t.date);
+          return txnDate.getMonth() === monthIndex && txnDate.getFullYear() === targetYear;
+        });
+      }
+    }
+    
     // Keyword search simulation for RAG
     if (filters.search) {
         const lowerSearch = filters.search.toLowerCase();
