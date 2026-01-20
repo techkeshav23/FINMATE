@@ -70,8 +70,8 @@ export const generateFallbackCharts = (message, categoryBreakdown, timelineData,
             }
         });
         
-        // Sort dates and prepare chart data
-        const sortedDates = Object.keys(dailyTotals).sort().slice(-7); // Last 7 active days max
+        // Sort dates and prepare chart data - show all available dates
+        const sortedDates = Object.keys(dailyTotals).sort();
         const chartLabels = sortedDates;
         const chartValues = sortedDates.map(d => dailyTotals[d]);
 

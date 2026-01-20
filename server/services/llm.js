@@ -112,8 +112,24 @@ class LLMService {
     // Get monthly data for long-term trends
     const monthlyData = db.getMonthlyData();
 
+    // Smart date range detection for timeline data
+    let timelineDays = 7; // Default: 7 days
+    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 
+                        'july', 'august', 'september', 'october', 'november', 'december'];
+    const monthMatch = monthNames.find(m => lowerMsg.includes(m));
+    
+    if (monthMatch || lowerMsg.includes('month') || lowerMsg.includes('monthly')) {
+      timelineDays = 31; // Full month
+    } else if (lowerMsg.includes('week') || lowerMsg.includes('weekly')) {
+      timelineDays = 7;
+    } else if (lowerMsg.includes('year') || lowerMsg.includes('yearly') || lowerMsg.includes('annual')) {
+      timelineDays = 365;
+    } else if (lowerMsg.includes('quarter') || lowerMsg.includes('3 month')) {
+      timelineDays = 90;
+    }
+
     // Get timeline data for trend charts
-    const timelineData = db.getTimelineData(7);
+    const timelineData = db.getTimelineData(timelineDays);
 
     const dataContext = `
       GLOBAL STATS:
