@@ -35,6 +35,9 @@ const getUserStorage = (userId) => {
   return userStorageCache[userId];
 };
 
+// Store current request for fallback when AsyncLocalStorage context is lost
+let currentRequest = null;
+
 // DB Wrapper to mimic SQL-like operations with simpler JSON
 const db = {
   // Middleware to handle user context per request (fixes concurrency)
@@ -42,9 +45,12 @@ const db = {
     // Get userId from header (preferred) or query param
     const userId = req.headers['x-user-id'] || req.query.userId || 'default';
     
+    // Store userId on request object as fallback (for multer async operations)
+    req.userId = userId;
+    currentRequest = req;
+    
     // Run the rest of the request within the user context
     userContext.run(userId, () => {
-        // Log inside the context so it's accurate
         if (userId !== 'default') {
              console.log(`[User] Request from user: ${userId.substring(0, 12)}...`);
         }
@@ -52,9 +58,17 @@ const db = {
     });
   },
 
-  // Get current user ID from AsyncContext
+  // Get current user ID - tries AsyncLocalStorage first, then falls back to request
   getCurrentUser: () => {
-    return userContext.getStore() || 'default'; 
+    const asyncUserId = userContext.getStore();
+    if (asyncUserId) return asyncUserId;
+    
+    // Fallback: check current request object
+    if (currentRequest && currentRequest.userId) {
+      return currentRequest.userId;
+    }
+    
+    return 'default'; 
   },
 
 
