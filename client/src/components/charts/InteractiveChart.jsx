@@ -302,6 +302,18 @@ export const InteractivePieChart = ({ data, title, onDrillDown, unit = '₹' }) 
   );
 };
 
+// Helper for safe date formatting
+const formatDateSafe = (value, options = { day: '2-digit', month: 'short' }) => {
+  if (!value) return '';
+  const d = new Date(value);
+  // Check if valid date
+  if (Object.prototype.toString.call(d) === "[object Date]" && !isNaN(d.getTime())) {
+    return d.toLocaleDateString('en-IN', options);
+  }
+  // Return original value if not a date (e.g., "Jan 2024" or already formatted string)
+  return value;
+};
+
 /**
  * InteractiveTimelineChart - Timeline with clickable data points
  * 
@@ -319,8 +331,8 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
   const handlePointClick = (point) => {
     setSelectedPoint(point);
     if (onDrillDown && point.date) {
-      const date = new Date(point.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-      onDrillDown(`Show me transactions from ${date}`);
+      const dateStr = formatDateSafe(point.date, { day: 'numeric', month: 'long' });
+      onDrillDown(`Show me transactions from ${dateStr}`);
     }
   };
 
@@ -345,7 +357,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#94a3b8', fontSize: 10 }}
-              tickFormatter={(value) => new Date(value).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              tickFormatter={(value) => formatDateSafe(value)}
               interval="preserveStartEnd"
             />
             <YAxis 
@@ -367,7 +379,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
                 return (
                   <CustomTooltip>
                     <p className="text-gray-900 font-medium">
-                      {new Date(item.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })}
+                      {formatDateSafe(item.date, { weekday: 'short', day: 'numeric', month: 'short' })}
                     </p>
                     <p className="text-primary-600 text-lg">{formatValue(item.amount, unit)}</p>
                     {item.count && (
@@ -402,7 +414,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
       {selectedPoint && (
         <div className="mt-3 p-2 bg-primary-500/10 border border-primary-500/30 rounded-lg flex items-center justify-between animate-fade-in">
           <span className="text-sm text-primary-600">
-            Loading transactions for <strong>{new Date(selectedPoint.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })}</strong>
+            Loading transactions for <strong>{formatDateSafe(selectedPoint.date, { day: 'numeric', month: 'long' })}</strong>
           </span>
           <ChevronRight className="w-4 h-4 text-primary-600 animate-pulse" />
         </div>
