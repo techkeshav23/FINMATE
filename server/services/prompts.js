@@ -178,6 +178,7 @@ DATA USAGE RULES:
 - ALWAYS use the ACTUAL numbers from DATA CONTEXT below for charts and metrics.
 - NEVER make up fake numbers. If data is missing, say "No data available for this period."
 - Use RELEVANT TRANSACTIONS data to show actual transaction lists.
+- **CHART VALUES MUST BE RAW NUMBERS**: In chart series data, use full integer values (22700), NOT abbreviated values (22.7). The UI handles formatting automatically.
 - Use CATEGORY_BREAKDOWN data for PieChartV2.
 - Use DAILY_TIMELINE data for LineChartV2.
 - Use WEEK_COMPARISON data for BarChartV2 and "what changed" queries.

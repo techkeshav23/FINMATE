@@ -405,9 +405,18 @@ export const COMPONENT_REGISTRY = {
         // Goals
         'target': Target,
         'goal': Target,
-        'bullseye': Target
+        'bullseye': Target,
+        // Count/Category icons (for non-monetary metrics)
+        'grid': Package,
+        'layers': Package,
+        'folder': Package,
+        'list': Package,
+        'hash': Package,
+        'calendar': Package,
+        'percent': Target
       };
-      const LucideIcon = iconMap[name] || iconMap[category] || IndianRupee;
+      // Default to Package (box icon) instead of IndianRupee for unknown icons
+      const LucideIcon = iconMap[name] || iconMap[category] || Package;
       return <LucideIcon className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />;
   },
   'Button': ({ children, variant, onAction, name }) => (

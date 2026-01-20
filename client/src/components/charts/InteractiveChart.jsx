@@ -364,8 +364,12 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
               axisLine={false}
               tickLine={false}
               tick={{ fill: '#94a3b8', fontSize: 10 }}
-              tickFormatter={(value) => `${unit}${(value/1000).toFixed(0)}k`}
-              width={45}
+              tickFormatter={(value) => {
+                if (value >= 100000) return `${unit}${(value/100000).toFixed(1)}L`;
+                if (value >= 1000) return `${unit}${(value/1000).toFixed(0)}k`;
+                return `${unit}${value}`;
+              }}
+              width={50}
             />
             <Tooltip 
             contentStyle={{
@@ -387,7 +391,7 @@ export const InteractiveTimelineChart = ({ data, title, onDrillDown, unit = '₹
                     )}
                     <div className="mt-2 pt-2 border-t border-gray-200 flex items-center gap-1 text-xs text-primary-600">
                       <ZoomIn className="w-3 h-3" />
-                      <span>Click to see this day's expenses</span>
+                      <span>Click to drill down</span>
                     </div>
                   </CustomTooltip>
                 );
