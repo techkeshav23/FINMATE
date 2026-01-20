@@ -196,15 +196,21 @@ Every response MUST have this structure in order:
 
 **CRITICAL: CURRENCY vs COUNT FORMATTING**
 - Use ₹ prefix ONLY for monetary amounts: "₹9,760", "₹30,490", "₹500"
-- DO NOT use ₹ for counts/numbers: "15" (transactions), "82" (count), "7" (days)
-- **ICON RULES:**
-  - For MONEY metrics (expenses, income, profit) → Use icon: "rupee" or "trending-up/down"
-  - For COUNT metrics (transactions, items, days) → Use icon: "file-text", "hash", or "list" - NEVER "rupee"!
+- DO NOT use ₹ for counts/numbers: "15" (transactions), "82" (count), "7" (days), "5" (categories)
+- **ICON RULES (VERY IMPORTANT!):**
+  - For MONEY metrics (expenses, income, profit) → Use icon: "rupee", "trending-up", or "trending-down"
+  - For COUNT metrics → Use these icons ONLY:
+    - "Transactions" → icon: "file-text" or "list"
+    - "Categories" → icon: "grid", "folder", or "layers" - NEVER "rupee"!
+    - "Items/Count" → icon: "package", "box", or "hash"
+    - "Days/Periods" → icon: "calendar"
+  - NEVER use "rupee" icon for any count metric!
 - Examples:
-  - ✅ "amount": "₹8,000", icon: "rupee" for "Total Expenses" (money)
-  - ✅ "amount": "11", icon: "file-text" for "Transactions" (count - NO ₹, NO rupee icon!)
+  - ✅ "amount": "₹8,000", icon: "trending-down" for "Total Expenses" (money)
+  - ✅ "amount": "160", icon: "file-text" for "Transactions" (count)
+  - ✅ "amount": "7", icon: "grid" for "Categories" (count - NO rupee icon!)
   - ✅ "amount": "74%", icon: "percent" for "Profit Margin"
-  - ❌ "amount": "₹11", icon: "rupee" for "Transactions" - WRONG! Counts don't have ₹ or rupee icon
+  - ❌ "amount": "7", icon: "rupee" for "Categories" - WRONG! Use "grid" or "folder"
 
 COMPONENT EXAMPLES (USE THESE EXACT STRUCTURES):
 
@@ -221,8 +227,8 @@ For Expense Breakdown queries (WITH MANDATORY ReasoningBlock):
       }},
       { "component": "MiniCardBlock", "props": { "children": [
         { "component": "MiniCard", "props": { "lhs": { "component": "DataTile", "props": { "amount": "₹9,760", "description": "Total Expenses", "child": { "component": "Icon", "props": { "name": "trending-down" } } } } } },
-        { "component": "MiniCard", "props": { "lhs": { "component": "DataTile", "props": { "amount": "₹30,490", "description": "Net Profit", "child": { "component": "Icon", "props": { "name": "trending-up" } } } } } },
-        { "component": "MiniCard", "props": { "lhs": { "component": "DataTile", "props": { "amount": "15", "description": "Transactions", "child": { "component": "Icon", "props": { "name": "file-text" } } } } } }
+        { "component": "MiniCard", "props": { "lhs": { "component": "DataTile", "props": { "amount": "15", "description": "Transactions", "child": { "component": "Icon", "props": { "name": "file-text" } } } } } },
+        { "component": "MiniCard", "props": { "lhs": { "component": "DataTile", "props": { "amount": "5", "description": "Categories", "child": { "component": "Icon", "props": { "name": "grid" } } } } } }
       ] } },
       { "component": "PieChartV2", "props": { "chartData": { "header": { "component": "InlineHeader", "props": { "heading": "Category Distribution" } }, "data": [{"category": "Inventory", "value": 5200}, {"category": "Rent", "value": 2000}] } } },
       { "component": "CalloutV2", "props": { "variant": "warning", "title": "💡 Recommendation", "description": "Your inventory is 53% of expenses. Consider negotiating bulk discounts or reducing order frequency." } },
