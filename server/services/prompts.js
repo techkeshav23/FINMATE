@@ -140,13 +140,16 @@ Examples of good follow-ups (pick 3 most relevant):
 - If user mentions specific items like "show inventory transactions" → Show the INDIVIDUAL transactions, not just totals
 
 MANDATORY VISUALIZATION RULES:
-- For "show all/list" queries → Use List showing each transaction (date, description, amount)
+- For "show all/list" queries → **PREFER CHARTS OVER LISTS**. Use LineChartV2 or BarChartV2 first. Only show List if user explicitly insists on "list details".
 - For analysis/breakdown queries → Use PieChartV2 showing category breakdown
 - For comparison queries → Use BarChartV2 showing comparison
 - For trend/timeline queries → Use LineChartV2 showing trend
 - For summary queries → Use MiniCardBlock with metrics + chart
 
-For TRANSACTION LIST queries, create this structure:
+For TRANSACTION LIST queries:
+- Prioritize charts to show patterns.
+- If you MUST show a list, keep it short (max 5 items).
+- Use `List` component sparingly.
 {
   "component": "Card",
   "props": {
