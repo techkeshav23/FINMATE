@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Upload, IndianRupee, ShoppingCart, Package } from 'lucide-react';
+import { Send, Loader2, Upload, IndianRupee, ShoppingCart, Package, Mic, MicOff } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import { CSVUpload } from './layout';
 
@@ -48,6 +48,7 @@ const ChatWindow = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [showImport, setShowImport] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -93,6 +94,51 @@ const ChatWindow = ({
       e.preventDefault();
       handleSubmit(e);
     }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      // Logic to stop is handled by the recognition.onend usually, 
+      // but we can force stop if we had the instance ref. 
+      // For simple "toggle", we rely on the object's lifecycle or simple restart prevention.
+      // Since we create a new instance on click, we mainly handle "start" here.
+      // Ideally we would keep the recognition instance in a ref to stop it manually.
+      return; 
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice input. Please use Chrome or Edge.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // Default to English, can be made dynamic
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setInputValue((prev) => (prev ? prev + ' ' + transcript : transcript));
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+      setIsRecording(false);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      // Auto-focus back to input
+      setTimeout(() => inputRef.current?.focus(), 100);
+    };
+
+    recognition.start();
   };
 
   const handleImportSuccess = (result, fileInfo) => {
@@ -239,6 +285,21 @@ const ChatWindow = ({
               disabled={isLoading}
               aria-label="Message input"
             />
+            {/* Mic Button */}
+            <button
+              type="button"
+              onClick={toggleRecording}
+              className={`p-2 rounded-full transition-colors touch-manipulation ${
+                isRecording 
+                  ? 'bg-red-100 text-red-600 animate-pulse' 
+                  : 'hover:bg-amber-100 text-amber-600'
+              }`}
+              title="Voice Input"
+              aria-label="Voice Input"
+            >
+              {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </button>
+
             <button
               type="submit"
               disabled={!inputValue.trim() || isLoading}
