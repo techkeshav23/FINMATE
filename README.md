@@ -447,5 +447,5 @@ MIT License - see [LICENSE](LICENSE) file.
 
 <div align="center">
 
-### 🪙 FinMate - *Because understanding your money shouldn't require a finance degree.*
+###  FinMate - *Because understanding your money shouldn't require a finance degree.*
 </div>
