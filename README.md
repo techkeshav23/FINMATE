@@ -24,13 +24,6 @@
 
 ---
 
-## 📺 Demo Video
-
-> 🎬 **[Watch 2-minute Demo →](https://youtube.com/watch?v=YOUR_VIDEO_ID)**
->
-> See FinMate transform a small tea vendor's confusion into clarity.
-
----
 
 ## 🎯 The Problem We're Solving
 
