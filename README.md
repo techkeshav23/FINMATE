@@ -10,7 +10,7 @@
 
   <br/>
 
-  [![ENCODE UDGIAM](https://img.shields.io/badge/🏆%20ENCODE-UDGIAM%202026-FFD700?style=for-the-badge)](https://encode.udgiam.com)
+  [![ENCODE UDGAM](https://img.shields.io/badge/🏆%20ENCODE-UDGAM%202026-FFD700?style=for-the-badge)](https://encode.UDGAM.com)
   [![Thesys CI](https://img.shields.io/badge/Powered%20by-Thesys%20CI-6366F1?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTIgMkw0IDdWMTdMIDEyIDIyTDIwIDE3VjdMMTIgMloiIGZpbGw9IndoaXRlIi8+PC9zdmc+)](https://thesys.dev/)
   
   <br/>
@@ -469,7 +469,7 @@ date,type,amount,category,description
 
 ## 👥 Team
 
-Built with ❤️ for **ENCODE | UDGIAM | Code To Innovate 2026**
+Built with ❤️ for **ENCODE | UDGAM | Code To Innovate 2026**
 
 ---
 
@@ -482,7 +482,7 @@ MIT License - see [LICENSE](LICENSE) file.
 ## 🙏 Acknowledgments
 
 - **[Thesys](https://thesys.dev/)** - Generative UI platform & credits
-- **[ENCODE | UDGIAM](https://encode.udgiam.com)** - Hackathon organizers
+- **[ENCODE | UDGAM](https://encode.UDGAM.com)** - Hackathon organizers
 - **[Recharts](https://recharts.org/)** - Charting library
 - **[Tailwind CSS](https://tailwindcss.com/)** - Styling framework
 - **[Lucide](https://lucide.dev/)** - Icon library
