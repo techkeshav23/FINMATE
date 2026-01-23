@@ -391,43 +391,6 @@ FinMate dynamically generates these UI components via Thesys CI:
 | `FollowUpBlock` | Every response | Drill-down options |
 
 ---
-
-## 🏆 Hackathon Alignment
-
-### Judging Criteria Coverage
-
-| Criteria | Weight | Our Implementation |
-|----------|--------|-------------------|
-| **AI-Native Experience** | 50% | ✅ Natural language, adaptive UI, proactive insights, smart clarifications |
-| **Reasoning & Explainability** | 30% | ✅ ReasoningBlock in every response, confidence indicators, assumption transparency |
-| **Technical Execution** | 20% | ✅ Clean architecture, Thesys CI integration, proper error handling |
-
-### PS.md Requirements Checklist
-
-- [x] Gather data from sources (CSV, bank statements)
-- [x] Understand natural language questions
-- [x] Choose best visualization for each answer
-- [x] Break confusing data into clear views
-- [x] Let users zoom in, filter, explore
-- [x] Adapt UI as conversation evolves
-- [x] Guide from "What happened?" to "What should I do?"
-- [x] Ask smart follow-up questions
-- [x] Compare, simulate, explore scenarios
-- [x] Surface insights, surprises, and risks
-- [x] End conversations with clarity and agency
-
----
-
-## 📂 Sample Data
-
-The `sample-data/` folder contains ready-to-use datasets:
-
-| File | Duration | Transactions | Best For |
-|------|----------|--------------|----------|
-| `1-month-sample.csv` | 30 days | ~45 | Quick demo |
-| `6-month-sample.csv` | 180 days | ~180 | Trend analysis |
-| `12-month-sample.csv` | 365 days | ~365 | Full patterns |
-
 **CSV Format:**
 ```csv
 date,type,amount,category,description
@@ -485,7 +448,4 @@ MIT License - see [LICENSE](LICENSE) file.
 <div align="center">
 
 ### 🪙 FinMate - *Because understanding your money shouldn't require a finance degree.*
-
-**[🎬 Watch Demo](https://youtube.com/watch?v=YOUR_VIDEO_ID)** · **[🐛 Report Bug](https://github.com/yourusername/finmate/issues)** · **[💡 Request Feature](https://github.com/yourusername/finmate/issues)**
-
 </div>

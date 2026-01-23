@@ -435,6 +435,24 @@ export const COMPONENT_REGISTRY = {
       <div className={`flex flex-wrap gap-2 mt-4 ${className || ''}`}>{children}</div>
   ),
 
+  // Steps for Reasoning/Processes
+  'Steps': ({ children }) => (
+    <div className="space-y-4 my-4 pl-1">
+      {children}
+    </div>
+  ),
+  'StepsItem': ({ title, children }) => (
+    <div className="flex gap-3 relative">
+        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mt-0.5 ring-1 ring-indigo-100">
+           <div className="w-1.5 h-1.5 rounded-full bg-current" />
+        </div>
+        <div className="flex-1 space-y-1 pb-1">
+            {title && <h4 className="text-sm font-medium text-gray-900">{title}</h4>}
+            <div className="text-sm text-gray-600 leading-relaxed">{children}</div>
+        </div>
+    </div>
+  ),
+
   // Layouts
   'container': Container,
   'row': Row,
