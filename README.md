@@ -1,4 +1,4 @@
-# 🪙 FinMate - Your AI Financial Co-Pilot
+#  FinMate - Your AI Financial Co-Pilot
 
 <div align="center">
   <img src="client/public/logo.png" alt="FinMate Logo" width="140" height="140" />
